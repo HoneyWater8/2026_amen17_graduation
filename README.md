@@ -158,13 +158,23 @@ npx vercel                # 프로젝트 생성 + 연결. Root Directory를 FE�
 
 `FE/.vercel/project.json`이 생성되며 이 폴더는 **커밋하지 않습니다** (`.gitignore` 처리됨).
 
-### 이후 배포
+### 이후 배포 — Git 자동 배포
+
+`HoneyWater8/2026_amen17_graduation` 레포가 연결되어 있어 **`main`에 push하면 자동으로 프로덕션 배포**됩니다.
+
+```sh
+git push origin main      # → Vercel이 자동 빌드·배포
+```
+
+CLI로 직접 배포할 수도 있습니다.
 
 ```sh
 cd FE
 npx vercel                # 프리뷰 배포
 npx vercel --prod         # 프로덕션 배포
 ```
+
+> ⚠️ **Root Directory는 반드시 `FE`여야 합니다.** CLI 배포는 `FE/`를 통째로 올려서 `.`이어도 동작하지만, Git 빌드는 레포 루트에서 `package.json`을 찾기 때문에 `.`이면 실패합니다.
 
 ### 환경 변수
 

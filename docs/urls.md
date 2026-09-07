@@ -3,6 +3,7 @@
 | 항목 | URL |
 |---|---|
 | **Vercel 배포 (프로덕션)** | **https://2026amen17graduation.vercel.app** |
+| GitHub 레포 | https://github.com/HoneyWater8/2026_amen17_graduation |
 | Vercel 프로젝트 대시보드 | https://vercel.com/su-heon-choi-s-projects/2026_amen17_graduation |
 | 참고 레포 (2026 하나로 가족 한마당) | https://github.com/HoneyWater8/2026_hanaro_family_festival |
 | 참고 레포 배포본 | https://2026hanarofamilyfestival.vercel.app |
@@ -27,6 +28,7 @@
 | 프로젝트명 | `2026_amen17_graduation` |
 | Root Directory | `FE` |
 | 최초 배포 | 2026-09-07 (프로덕션) |
+| Git 연동 | `HoneyWater8/2026_amen17_graduation` — `main` push 시 자동 프로덕션 배포 |
 
 > ✅ 배포 도메인이 `FE/index.html`의 하드코딩 값과 일치함을 확인했습니다.
 > 도메인을 바꾸면 `og:url` · `og:image` · `twitter:image` 세 곳을 함께 교체해야 합니다.
