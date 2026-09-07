@@ -47,6 +47,22 @@ export const MOTION = {
   overlayFade: 'opacity .5s ease .55s',
   /** stage: opening → out 전환까지의 시간 (ms) */
   openDuration: 1500,
+
+  /**
+   * 진입 연출 — 라벨 → 봉투 → 안내 문구 순으로 약 1.55초에 걸쳐 도착.
+   * 왁스 씰·카드·플랩은 봉투 컨테이너의 자식이라 별도 연출 없이 함께 따라온다.
+   * fill-mode는 반드시 backwards. forwards/both면 애니메이션이 끝난 뒤에도
+   * 키프레임 값이 인라인 스타일을 덮어써서 봉투 열기 전환이 동작하지 않는다.
+   */
+  enter: {
+    label:    'ev-enter-up .6s cubic-bezier(.22,1,.36,1) .1s backwards',
+    envelope: 'ev-enter-envelope .8s cubic-bezier(.22,1,.36,1) .2s backwards',
+    /** 진입 후 이어서 호흡 시작 (.95 + .6 = 1.55s) */
+    hint:     'ev-enter-up .6s ease .95s backwards, ev-breathe 2.4s ease-in-out 1.55s infinite',
+  },
+
+  /** 표지 스크롤 힌트 — 다이아몬드가 선을 따라 아래에서 위로 올라가며 페이드 */
+  scrollHint: 'ev-scroll-hint 1.9s ease-in-out infinite',
 };
 
 /** 루트 레이아웃 */

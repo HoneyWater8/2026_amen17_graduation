@@ -4,6 +4,7 @@ import { Frame } from '../common/Frame';
 import { Reveal } from '../common/Reveal';
 import { Rule } from '../common/Rule';
 import { Seal } from '../common/Seal';
+import { ScrollHint } from '../common/ScrollHint';
 import { G } from '../../data/graduation';
 
 type CoverProps = { active: boolean };
@@ -53,6 +54,9 @@ export function Cover({ active }: CoverProps) {
           </div>
         </Reveal>
       </Frame>
+
+      {/* 첫 화면에서 멈추지 않도록 — 스크롤하면 영구히 사라진다 */}
+      <ScrollHint active={active} />
     </Section>
   );
 }

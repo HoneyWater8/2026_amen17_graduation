@@ -32,3 +32,30 @@ button { font-family: inherit; }
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.55; }
 }
+
+/* ── 진입 연출 — 편지가 도착하는 순간 ──
+   animation-fill-mode 는 반드시 backwards.
+   forwards/both 로 두면 끝난 뒤에도 키프레임 값이 인라인 스타일을 덮어써서
+   봉투 열기(opacity·transform 전환)가 먹지 않는다. */
+
+/* 상단 라벨 · 안내 문구 */
+@keyframes ev-enter-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 봉투 — 아래에서 떠오르며 도착. 왁스 씰·카드·플랩은 자식이라 함께 따라온다 */
+@keyframes ev-enter-envelope {
+  from { opacity: 0; transform: translateY(28px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 표지 스크롤 힌트 — 다이아몬드가 선을 따라 아래에서 위로 올라가며 페이드.
+   아래로 스크롤할 때의 실제 손가락 방향(스와이프 업)과 같다.
+   translateX(-50%)는 가운데 정렬 보정이라 키프레임마다 유지해야 한다. */
+@keyframes ev-scroll-hint {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0)     rotate(45deg); }
+  25%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-19px) rotate(45deg); }
+}

@@ -64,8 +64,8 @@
 
 | # | 섹션 | 핵심 요소 |
 |---|---|---|
-| — | **Envelope** | 화면 아무 곳이나 탭 → 플랩 `rotateX(-172°)` → 안쪽 카드 `-72%` 상승 → 오버레이 페이드아웃 (총 ~2.0s) |
-| 01 | **Cover** | 금박 이중 프레임, `AMEN 17TH`, 대형 타이틀, 왁스 씰, 일시·장소 한 줄 |
+| — | **Envelope** | **진입**: 라벨 → 봉투 → 안내 문구 순으로 도착 (~1.55s)<br>**열기**: 화면 아무 곳이나 탭 → 플랩 `rotateX(-172°)` → 안쪽 카드 `-72%` 상승 → 오버레이 페이드아웃 (~2.0s) |
+| 01 | **Cover** | 금박 이중 프레임, `AMEN 17TH`, 대형 타이틀, 왁스 씰, 일시·장소 한 줄<br>하단에 스크롤 힌트 — 한 번이라도 스크롤하면 영구히 사라짐 |
 | 02 | **Testimony** | 9:16 세로 영상. URL이 없거나 로드 실패 시 placeholder 슬롯으로 폴백 |
 | 03 | **Our Journey** | 6개 시기 세로 타임라인 + 시기마다 사진 5장 가로 캐러셀 |
 | 04 | **Graduates** | 4열 이름 그리드 |
@@ -94,10 +94,11 @@
 │   │   ├── hooks/
 │   │   │   ├── useReveal.ts            # IntersectionObserver + active 게이트
 │   │   │   ├── useDragScroll.ts        # 가로 캐러셀 조작 3종
+│   │   │   ├── useScrolled.ts          # 스크롤 여부 1회 판정 (힌트 숨김용)
 │   │   │   └── usePrefersReducedMotion.ts
 │   │   └── components/
 │   │       ├── sections/               # Envelope, Cover, Testimony, Journey, Graduates, Closing
-│   │       └── common/                 # Section, Frame, Rule, SectionHead, Seal, PhotoRail, Reveal, CornerOrnaments
+│   │       └── common/                 # Section, Frame, Rule, SectionHead, Seal, PhotoRail, Reveal, ScrollHint, CornerOrnaments
 │   ├── index.html                      # 폰트 링크 + OG 태그
 │   ├── .env.example
 │   └── package.json
@@ -263,6 +264,7 @@ EV.seal      = '#8C2B22'   // 포인트 (씰·영문 라벨·다이아몬드)
 6. **봉투 안 카드에 `overflow: hidden`** — `aspect-ratio`를 줘도 flex 자식의 min-content 높이가 더 크면 넘칩니다. (`Envelope.tsx`)
 7. **`Reveal`의 `active` 게이트** — 봉투가 열리기 전에 본문 등장 애니메이션이 소진되지 않도록, `stage === 'out'`이 되기 전에는 IntersectionObserver 관찰 자체를 시작하지 않습니다. (`useReveal.ts`)
 8. **금색 텍스트 대비** — 위 「디자인 토큰」 경고 참조.
+9. **진입 연출의 `animation-fill-mode`는 반드시 `backwards`.** `forwards`/`both`로 두면 애니메이션이 끝난 뒤에도 마지막 키프레임 값이 인라인 스타일을 계속 덮어써서, 봉투 열기의 `opacity`·`transform` 전환이 아예 먹지 않습니다. `backwards`는 지연 구간에만 첫 키프레임을 적용하고 종료 후에는 원래 스타일로 돌아갑니다 — 마지막 키프레임을 자연 상태와 같게 맞춰두었으므로 튐이 없습니다. (`index.css`, `theme/tokens.ts`의 `MOTION.enter`)
 
 ### 프로토타입 → 정식 앱 변환
 

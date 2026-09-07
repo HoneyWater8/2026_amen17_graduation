@@ -1,4 +1,5 @@
-import { EV, FF } from '../../theme/tokens';
+import { EV, FF, MOTION } from '../../theme/tokens';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { CornerOrnaments } from '../common/CornerOrnaments';
 import { Seal } from '../common/Seal';
 import { G } from '../../data/graduation';
@@ -18,6 +19,11 @@ type EnvelopeProps = {
  */
 export function Envelope({ stage, onOpen }: EnvelopeProps) {
   const opening = stage !== 'closed';
+  const reduced = usePrefersReducedMotion();
+
+  // 진입 연출은 모션 감소 모드이거나 이미 열리는 중이면 붙이지 않는다.
+  // 열기 시작과 동시에 걷어내야 인라인 opacity·transform 전환이 곧바로 먹는다.
+  const enter = (value: string) => (reduced || opening ? undefined : value);
 
   return (
     <div
@@ -38,10 +44,14 @@ export function Envelope({ stage, onOpen }: EnvelopeProps) {
           fontFamily: FF.serif, fontSize: 12, fontWeight: 700, letterSpacing: 2,
           color: EV.goldTx,
           opacity: opening ? 0 : 1, transition: 'opacity .3s ease',
+          animation: enter(MOTION.enter.label),
         }}>{G.meta.org}</div>
 
         {/* 봉투 */}
-        <div style={{ position: 'relative', marginTop: 22, aspectRatio: '3 / 2', perspective: 900 }}>
+        <div style={{
+          position: 'relative', marginTop: 22, aspectRatio: '3 / 2', perspective: 900,
+          animation: enter(MOTION.enter.envelope),
+        }}>
 
           {/* 안에서 빠져나오는 카드.
               ⚠ aspect-ratio를 줘도 flex 자식의 min-content 높이가 더 크면 늘어난다 → overflow: hidden 필수 */}
@@ -129,7 +139,7 @@ export function Envelope({ stage, onOpen }: EnvelopeProps) {
           fontFamily: FF.serif, fontSize: 14, fontWeight: 700, letterSpacing: 1,
           color: EV.ink,
           opacity: opening ? 0 : 1, transition: 'opacity .3s ease',
-          animation: opening ? 'none' : 'ev-breathe 2.4s ease-in-out infinite',
+          animation: enter(MOTION.enter.hint),
         }}>
           <svg width="15" height="15" viewBox="0 0 16 16">
             <circle cx="8" cy="8" r="6.5" fill="none" stroke={EV.gold} strokeWidth="1.2" />
