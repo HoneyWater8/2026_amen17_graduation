@@ -1,0 +1,34 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  /* 스크롤 바운스 시 다른 색이 노출되지 않도록 루트 바깥 여백색과 일치 */
+  background: #E5DCC8;
+  font-family: 'Nanum Myeongjo', serif;
+  color: #1E1B16;
+}
+
+#root {
+  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+a { color: #A8862C; }
+a:hover { color: #8C2B22; }
+button { font-family: inherit; }
+
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* 봉투 안내 문구 — 호흡하듯 페이드 */
+@keyframes ev-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
