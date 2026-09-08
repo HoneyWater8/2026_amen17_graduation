@@ -71,6 +71,10 @@
 | 04 | **Graduates** | 4열 이름 그리드 |
 | 05 | **Closing** | 느헤미야 8:6 · 겹낫표 · 푸터 |
 
+스크롤과 무관하게 떠 있는 요소:
+
+- **ShareFAB** — 우하단 공유 버튼. 봉투가 걷힌 뒤에만 나타나며(오버레이보다 z-index가 높아 게이트 필수), 탭하면 바텀시트가 올라옵니다. 링크 복사 / 카카오톡 공유 두 가지, 핸들을 아래로 끌거나 배경 탭·`Esc`로 닫힙니다.
+
 ---
 
 ## 폴더 구조
@@ -96,9 +100,13 @@
 │   │   │   ├── useDragScroll.ts        # 가로 캐러셀 조작 3종
 │   │   │   ├── useScrolled.ts          # 스크롤 여부 1회 판정 (힌트 숨김용)
 │   │   │   └── usePrefersReducedMotion.ts
-│   │   └── components/
-│   │       ├── sections/               # Envelope, Cover, Testimony, Journey, Graduates, Closing
-│   │       └── common/                 # Section, Frame, Rule, SectionHead, Seal, PhotoRail, Reveal, ScrollHint, CornerOrnaments
+│   │   ├── components/
+│   │   │   ├── sections/               # Envelope, Cover, Testimony, Journey, Graduates, Closing
+│   │   │   └── common/                 # Section, Frame, Rule, SectionHead, Seal, PhotoRail,
+│   │   │                               #   Reveal, ScrollHint, ShareFAB, CornerOrnaments
+│   │   └── utils/
+│   │       ├── kakaoShare.ts           # Kakao SDK 로더 + sendScrap (OG 태그 기반)
+│   │       └── share.ts                # 정식 URL · 링크 복사 · 네이티브 공유 폴백
 │   ├── index.html                      # 폰트 링크 + OG 태그
 │   ├── .env.example
 │   └── package.json
@@ -179,7 +187,14 @@ npx vercel --prod         # 프로덕션 배포
 
 ### 환경 변수
 
-현재 필수 환경 변수는 **없습니다.** 영상이 준비되면 `VITE_VIDEO_URL`만 등록하면 됩니다 (자세한 내용은 `FE/.env.example`).
+필수 환경 변수는 **없습니다.** 둘 다 없어도 페이지는 정상 동작하며, 준비되는 대로 등록하면 됩니다 (자세한 내용은 `FE/.env.example`).
+
+| 변수 | 용도 | 없을 때 |
+|---|---|---|
+| `VITE_VIDEO_URL` | 졸업 간증 영상 | placeholder 슬롯 표시 |
+| `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
+
+> `VITE_KAKAO_JS_KEY`는 카카오 개발자 콘솔의 **JavaScript 키**이며, 앱 설정 → 플랫폼 → Web → 사이트 도메인에 `https://2026amen17graduation.vercel.app`을 **등록해야** 동작합니다.
 
 ```sh
 npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 가져오기
@@ -306,6 +321,8 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [ ] 여정 사진 30장 교체 (4:3 권장)
 - [ ] 졸업 간증 영상 업로드 및 연결
 - [ ] 카카오 공유용 `thumbnail.png` (800×800) 제작 — **현재 404, 공유 카드 이미지 없음**
+- [ ] `VITE_KAKAO_JS_KEY` 발급 + 도메인 등록 — 없으면 네이티브 공유로 폴백
+- [ ] `public/icons/kakaotalk.png` (20×20 이상) — 없으면 인라인 SVG 말풍선으로 폴백
 - [ ] 폰트 자체 호스팅 + 서브셋 (Google Fonts 의존 제거)
 - [ ] 어워드(시상) 섹션 — 디자인 1단계에서 보류된 후속 과제
 

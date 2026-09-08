@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { EV, LAYOUT, MOTION } from './theme/tokens';
 import type { EnvelopeStage } from './data/types';
 import { Envelope } from './components/sections/Envelope';
+import { ShareFAB } from './components/common/ShareFAB';
 import { Cover } from './components/sections/Cover';
 import { Testimony } from './components/sections/Testimony';
 import { Journey } from './components/sections/Journey';
@@ -57,6 +58,9 @@ export default function App() {
 
       {/* 봉투 오버레이 (z-index 20) — stage === 'out' 이면 투명 + pointer-events none */}
       <Envelope stage={stage} onOpen={open} />
+
+      {/* 공유 FAB (z-index 40+) — 봉투 오버레이보다 위라 열린 뒤에만 노출된다 */}
+      <ShareFAB active={active} />
     </div>
   );
 }
