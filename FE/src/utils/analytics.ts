@@ -36,10 +36,20 @@ export function initAnalytics() {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  const gtag: Window['gtag'] = (...args) => { window.dataLayer!.push(args); };
-  window.gtag = gtag;
-  gtag('js', new Date());
-  gtag('config', GA_ID);
+
+  // ⚠️ 반드시 `arguments` 객체를 push해야 한다.
+  //    화살표 함수 + 나머지 매개변수로 바꿔 배열을 push하면 gtag.js가 이를
+  //    명령으로 인식하지 못해 아무 이벤트도 전송되지 않는다 (2026-09-11 실제로 겪음).
+  //    그래서 rest params 대신 arguments를 쓰는 일반 함수여야 한다.
+  function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer!.push(arguments);
+  }
+  // gtag는 매개변수 없이 선언되므로(arguments를 쓰기 때문) 호출은 타입을 씌운 참조로 한다.
+  const send = gtag as NonNullable<Window['gtag']>;
+  window.gtag = send;
+  send('js', new Date());
+  send('config', GA_ID);
 }
 
 /**
