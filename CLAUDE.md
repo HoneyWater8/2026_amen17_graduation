@@ -8,7 +8,7 @@
 
 | 경로 | 내용 |
 |---|---|
-| `FE/` | Vite 8 + React 19 + TS 6. 런타임 의존성 `react`/`react-dom` 2개. **서버·API 없음** |
+| `FE/` | Vite 8 + React 19 + TS 6. 런타임 의존성 3개(`react`/`react-dom`/`@vercel/analytics`). **서버·API 없음** |
 | `FE-legacy/` | Claude Design 핸드오프 원본. **구현 기준 스펙은 `FE-legacy/README.md`** |
 | `docs/` | 요구사항 · 작업로그 · 메모리 |
 

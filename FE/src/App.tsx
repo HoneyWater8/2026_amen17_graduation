@@ -4,10 +4,12 @@
    ───────────────────────────────────────────────────────── */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { EV, LAYOUT, MOTION } from './theme/tokens';
 import type { EnvelopeStage } from './data/types';
 import { Envelope } from './components/sections/Envelope';
 import { ShareFAB } from './components/common/ShareFAB';
+import { track } from './utils/analytics';
 import { Cover } from './components/sections/Cover';
 import { Testimony } from './components/sections/Testimony';
 import { Journey } from './components/sections/Journey';
@@ -22,6 +24,8 @@ export default function App() {
   const active = stage === 'out';
 
   const open = useCallback(() => {
+    // 페이지에 들어온 사람 중 실제로 봉투를 연 비율을 보기 위한 지표.
+    track('envelope_open');
     setStage('opening');
     openTimerRef.current = window.setTimeout(() => setStage('out'), MOTION.openDuration);
   }, []);
@@ -61,6 +65,9 @@ export default function App() {
 
       {/* 공유 FAB (z-index 40+) — 봉투 오버레이보다 위라 열린 뒤에만 노출된다 */}
       <ShareFAB active={active} />
+
+      {/* Vercel Web Analytics — 방문자·페이지뷰·유입 경로 (쿠키 없음) */}
+      <Analytics />
     </div>
   );
 }

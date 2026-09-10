@@ -9,6 +9,7 @@
 - [이전 프로젝트 컨벤션 답습 선호](./prefers-mirroring-prior-project.md) — 새 구조를 발명하지 말 것
 - [관습적·담백한 UI 선호](./prefers-plain-conventional-ui.md) — 장식을 더하지 말고 먼저 제안할 것
 - [자산 파이프라인](./asset-pipeline.md) — 원본은 커밋하지 않고 리사이즈본만. 재생성은 scripts/resize-photos.py
+- [사용자 집계 설정](./analytics-setup.md) — Vercel+GA4 두 축. **2026-10 중순 전에 Vercel 대시보드 캡처 필요**
 - [카카오 앱 설정](./kakao-app-setup.md) — 도메인은 「제품 링크 관리」에 등록. 플랫폼>Web 아님
 - [Vercel 배포 설정과 함정](./vercel-deploy-setup.md) — 계정·프로젝트 정보 + FE/ 하위 구조 때문에 생기는 함정 4가지
 - [커밋·푸시는 지시받을 때만](./ask-before-commit-push.md) — push가 곧 공개 배포라 알아서 커밋하지 말 것

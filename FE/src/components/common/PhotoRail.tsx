@@ -4,6 +4,7 @@ import { EV, FF } from '../../theme/tokens';
 import { useShuffled } from '../../hooks/useShuffled';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { Lightbox } from './Lightbox';
+import { track } from '../../utils/analytics';
 import type { JourneyPhoto } from '../../data/types';
 
 // 카드 크기 — wrap 거리 계산에 쓰이므로 아래 인라인 스타일과 반드시 일치해야 한다.
@@ -145,7 +146,10 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   // 끌고 난 직후의 pointerup은 탭으로 치지 않는다.
   const handleCardClick = (i: number) => {
     if (dragRef.current.moved > DRAG_THRESHOLD) return;
-    if (shuffled[i]?.full) setOpenIndex(i);
+    if (shuffled[i]?.full) {
+      track('photo_open');
+      setOpenIndex(i);
+    }
   };
 
   const doubled = [...shuffled, ...shuffled];

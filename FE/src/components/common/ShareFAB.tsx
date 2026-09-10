@@ -4,6 +4,7 @@ import { EV, FF } from '../../theme/tokens';
 import { shareToKakao, hasKakaoKey } from '../../utils/kakaoShare';
 import { canonicalUrl, copyLink, nativeShare, canNativeShare } from '../../utils/share';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { track } from '../../utils/analytics';
 import { G } from '../../data/graduation';
 
 const SHEET_TRANSITION_MS = 320;
@@ -59,6 +60,7 @@ export const ShareFAB = memo(function ShareFAB({ active }: ShareFABProps) {
   }, []);
 
   const openSheet = useCallback(() => {
+    track('share_open');
     setDragY(0);
     setMounted(true);
     // 두 번의 rAF — 첫 렌더에 translateY(100%)가 적용된 뒤 다음 프레임에 0으로 transition.
@@ -105,15 +107,17 @@ export const ShareFAB = memo(function ShareFAB({ active }: ShareFABProps) {
 
   const handleCopy = useCallback(async () => {
     const ok = await copyLink(canonicalUrl());
+    track('share_copy', { ok });
     closeSheet();
     showToast(ok ? '링크가 복사되었어요' : '복사에 실패했어요');
   }, [closeSheet, showToast]);
 
   const handleKakao = useCallback(async () => {
     const url = canonicalUrl();
-    if (await shareToKakao(url)) { closeSheet(); return; }
+    // 카카오 SDK / 네이티브 시트 중 어느 경로로 나갔는지 구분해 집계한다.
+    if (await shareToKakao(url)) { track('share_kakao'); closeSheet(); return; }
     // JS키가 없거나 SDK가 실패하면 네이티브 공유 시트로 넘긴다.
-    if (await nativeShare(url, `${G.meta.org} · ${G.meta.cohort} 졸업`)) { closeSheet(); return; }
+    if (await nativeShare(url, `${G.meta.org} · ${G.meta.cohort} 졸업`)) { track('share_native'); closeSheet(); return; }
     closeSheet();
     showToast('공유에 실패했어요. 링크를 복사해 주세요');
   }, [closeSheet, showToast]);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { EV, FF } from '../../theme/tokens';
 import type { GradVideo } from '../../data/types';
+import { track } from '../../utils/analytics';
 
 type VideoSlotProps = {
   video: GradVideo;
@@ -53,6 +54,7 @@ export function VideoSlot({
             playsInline
             preload="metadata"
             onError={() => setFailed(true)}
+            onPlay={() => track('video_play', { video: slotKey ?? 'unknown' }, true)}
             style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
           />
         ) : (

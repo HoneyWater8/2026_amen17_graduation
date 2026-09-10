@@ -44,7 +44,7 @@
 | Fonts | Nanum Myeongjo · Cinzel Decorative (Google Fonts) |
 | Lint | typescript-eslint, eslint-plugin-react-hooks |
 
-런타임 의존성은 `react`, `react-dom` 두 개뿐입니다. 라우터·상태관리·CSS 프레임워크 없이 인라인 스타일과 로컬 state로 처리합니다. API·서버 상태가 없어 서버리스 함수도 두지 않았습니다.
+런타임 의존성은 `react`, `react-dom`, `@vercel/analytics` 세 개뿐입니다. 라우터·상태관리·CSS 프레임워크 없이 인라인 스타일과 로컬 state로 처리합니다. API·서버 상태가 없어 서버리스 함수도 두지 않았습니다.
 
 ---
 
@@ -200,6 +200,7 @@ npx vercel --prod         # 프로덕션 배포
 | `VITE_TESTIMONY_VIDEO_URL` | 졸업 간증 영상 (§02) | placeholder 슬롯 표시 |
 | `VITE_GRADUATION_VIDEO_URL` | 졸업식 영상 (§03 여정 마지막) | placeholder 슬롯 표시 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
+| `VITE_GA_ID` | GA4 행동 추적 | GA 스크립트를 로드하지 않음 (Vercel 집계는 계속 동작) |
 
 > `VITE_KAKAO_JS_KEY`는 카카오 개발자 콘솔의 **JavaScript 키**입니다. 키만으로는 동작하지 않고, 콘솔에 배포 도메인을 등록해야 합니다.
 >
@@ -224,6 +225,31 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 - ✅ **도메인 일치 확인 완료** — 프로덕션 별칭이 `https://2026amen17graduation.vercel.app` 로 잡혀 하드코딩 값과 같습니다. 도메인을 바꾸면 `og:url` · `og:image` · `twitter:image` 세 곳을 함께 교체하세요.
 - ✅ **`public/icons/thumbnail.png`** — 1200×630 (1.91:1). 정사각형은 카카오톡에서 작은 썸네일로 붙어 눈에 덜 띕니다.
 - ⚠️ **카카오는 OG 이미지를 URL 단위로 캐싱합니다.** 같은 경로에 파일만 바꾸면 옛 이미지가 계속 나갑니다. [공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에서 캐시를 초기화하거나, 확실히 하려면 파일명을 바꾸고 `og:image`도 함께 고치세요.
+
+### 사용자 집계
+
+두 도구를 역할을 나눠 씁니다. 참고 레포에서 **페이지뷰·UV를 아예 수집하지 못한 것**이 아쉬웠던 점이라, 이번에는 사전에 붙였습니다.
+
+| | Vercel Web Analytics | Google Analytics 4 |
+|---|---|---|
+| 무엇 | 방문자 수 · 페이지뷰 · 유입 경로 · 기기 | 봉투 열기 · 섹션 도달 · 영상 재생 · 공유 · 사진 확대 |
+| 켜는 법 | `<Analytics />` (항상 켜짐) | `VITE_GA_ID` 있을 때만 로드 |
+| 쿠키 | 없음 | 사용 |
+| 보존 | **1개월** (Hobby) | 14개월 |
+
+**Vercel 대시보드에서 Web Analytics를 활성화**해야 수집이 시작됩니다 (프로젝트 → Analytics 탭 → Enable).
+
+수집하는 GA4 이벤트:
+
+| 이벤트 | 시점 |
+|---|---|
+| `envelope_open` | 봉투를 눌러 열었을 때 |
+| `section_view` | 섹션이 40% 이상 보였을 때 (`section` = `01 Cover` 등). 왕복해도 1회만 |
+| `video_play` | 영상 재생 (`video` = `testimony` / `graduation`) |
+| `photo_open` | 사진 카드를 눌러 확대 |
+| `share_open` · `share_kakao` · `share_native` · `share_copy` | 공유 시트 열기와 각 경로 |
+
+> ⚠️ **Hobby 플랜은 Vercel 데이터가 1개월만 보존됩니다.** 행사 후 통계를 정리하시려면 **2026년 10월 중순 전에** 대시보드를 캡처해 두세요. Hobby는 커스텀 이벤트도 지원하지 않아 위 행동 지표는 GA4에서만 볼 수 있습니다.
 
 ### 운영 정책
 
