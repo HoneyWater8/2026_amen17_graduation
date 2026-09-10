@@ -200,7 +200,6 @@ npx vercel --prod         # 프로덕션 배포
 | `VITE_TESTIMONY_VIDEO_URL` | 졸업 간증 영상 (§02) | placeholder 슬롯 표시 |
 | `VITE_GRADUATION_VIDEO_URL` | 졸업식 영상 (§03 여정 마지막) | placeholder 슬롯 표시 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
-| `VITE_GA_ID` | GA4 행동 추적 | GA 스크립트를 로드하지 않음 (Vercel 집계는 계속 동작) |
 
 > `VITE_KAKAO_JS_KEY`는 카카오 개발자 콘솔의 **JavaScript 키**입니다. 키만으로는 동작하지 않고, 콘솔에 배포 도메인을 등록해야 합니다.
 >
@@ -233,7 +232,7 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 | | Vercel Web Analytics | Google Analytics 4 |
 |---|---|---|
 | 무엇 | 방문자 수 · 페이지뷰 · 유입 경로 · 기기 | 봉투 열기 · 섹션 도달 · 영상 재생 · 공유 · 사진 확대 |
-| 켜는 법 | `<Analytics />` (항상 켜짐) | `VITE_GA_ID` 있을 때만 로드 |
+| 켜는 법 | `<Analytics />` (항상 켜짐) | `index.html`의 표준 gtag 스니펫 |
 | 쿠키 | 없음 | 사용 |
 | 보존 | **1개월** (Hobby) | 14개월 |
 

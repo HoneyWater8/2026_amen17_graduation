@@ -28,6 +28,21 @@
     <link rel="icon" type="image/png" sizes="180x180" href="/icons/favicon-180.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 
+    <!-- Google Analytics 4 — 구글 표준 스니펫 그대로.
+         번들러를 거치지 않고 여기에 두는 이유: gtag는 `arguments` 객체를 dataLayer에
+         push해야 하는데, 모듈로 감싸 동적 로드했을 때 page_view가 en 파라미터 없이
+         나가 GA가 이벤트를 인식하지 못했다 (2026-09-11).
+         측정 ID는 스크립트에 노출되는 공개 값이라 하드코딩해도 무방하다.
+         ?ga_debug=1 로 접속하면 DebugView에 실시간으로 찍힌다. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P7PXPF9CWM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-P7PXPF9CWM',
+        new URLSearchParams(location.search).has('ga_debug') ? { debug_mode: true } : {});
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
