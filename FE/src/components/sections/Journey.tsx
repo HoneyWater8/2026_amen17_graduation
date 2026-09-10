@@ -3,6 +3,7 @@ import { Section } from '../common/Section';
 import { SectionHead } from '../common/SectionHead';
 import { Reveal } from '../common/Reveal';
 import { PhotoRail } from '../common/PhotoRail';
+import { VideoSlot } from '../common/VideoSlot';
 import { G } from '../../data/graduation';
 
 type JourneyProps = { active: boolean };
@@ -39,12 +40,27 @@ export function Journey({ active }: JourneyProps) {
                 marginTop: 2, fontFamily: FF.serif, fontSize: 16,
                 fontWeight: 700, color: EV.ink,
               }}>{t.title}</div>
-              <div style={{
-                marginTop: 2, fontFamily: FF.sans, fontSize: 11,
-                color: EV.inkSoft, lineHeight: 1.5,
-              }}>{t.desc}</div>
+              {t.desc && (
+                <div style={{
+                  marginTop: 2, fontFamily: FF.sans, fontSize: 11,
+                  color: EV.inkSoft, lineHeight: 1.5,
+                }}>{t.desc}</div>
+              )}
 
-              <PhotoRail photos={t.photos} />
+              {/* 아직 치르지 않은 일정(졸업식)은 사진 대신 영상 자리를 둔다.
+                  타임라인 항목 안이라 본편(Testimony)보다 작게 잡는다. */}
+              {t.video ? (
+                <div style={{ marginTop: 9, marginRight: 22 }}>
+                  <VideoSlot
+                    video={t.video}
+                    iconSize={34}
+                    pad={5}
+                    slotKey="graduation"
+                  />
+                </div>
+              ) : (
+                t.photos && <PhotoRail photos={t.photos} />
+              )}
             </div>
           </Reveal>
         ))}

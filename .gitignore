@@ -1,3 +1,7 @@
 # 발주 통화 녹음 원본 — 실명·개인 사정이 그대로 담겨 있어 커밋하지 않는다.
 # 저장소에는 익명화 버전(docs/call-transcript.txt)만 포함한다.
 docs/통화 녹음*.txt
+
+# 여정 사진 원본 (95MB) — 리사이즈본만 FE/public/journey/ 에 커밋한다.
+# 재생성: python scripts/resize-photos.py
+제자17기-*/

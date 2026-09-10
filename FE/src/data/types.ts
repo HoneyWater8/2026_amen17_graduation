@@ -31,35 +31,45 @@ export type GradWhere = {
 
 export type GradVideo = {
   /**
-   * 졸업 간증 영상 URL.
-   * VITE_VIDEO_URL(Vercel Blob 등)이 있으면 그 값, 없으면 public 경로.
-   * 재생에 실패하면 Testimony가 placeholder 슬롯으로 자동 폴백.
+   * 영상 URL. 환경 변수(Vercel Blob 등)가 있으면 그 값, 없으면 public 경로.
+   * 비어 있거나 재생에 실패하면 VideoSlot이 placeholder로 자동 폴백한다.
    */
   src: string;
   /** 첫 프레임 포스터 이미지 — 없으면 검은 배경 */
   poster?: string;
   dur: string;
-  desc: string;
+  /** 영상 자체의 설명. 타임라인 항목은 JourneyItem.desc를 쓰므로 여기서는 비워둔다 */
+  desc?: string;
   /** 영상이 아직 없을 때 placeholder에 표시할 안내 문구 */
   note: string;
 };
 
 export type JourneyPhoto = {
+  /** 이미지 alt 텍스트 전용. 화면에는 표시하지 않는다 */
   caption: string;
-  /** 슬롯 번호(01~30). 실제 이미지가 없을 때 placeholder에 표시 */
-  tag: string;
-  /** 실제 사진 경로 (예: '/journey/01.jpg'). 비우면 tag placeholder */
-  image?: string;
+  /** 캐러셀 카드용 썸네일(320w). 없으면 tag placeholder를 표시 */
+  thumb?: string;
+  /** 라이트박스용 이미지(1280w). 카드를 눌렀을 때만 로드된다 */
+  full?: string;
+  /** 사진이 아직 없는 시기의 placeholder 번호 */
+  tag?: string;
 };
 
 export type JourneyItem = {
   /** 시기 라벨 (예: "2025 · 봄") — 한글이 섞이므로 serif로 조판 */
   period: string;
   title: string;
-  desc: string;
+  /** 한 줄 설명. 현재는 쓰지 않지만 필요해지면 항목에 다시 넣으면 된다 */
+  desc?: string;
   /** 현재 시점이면 타임라인 다이아몬드를 채움 */
   now?: boolean;
-  photos: JourneyPhoto[];
+  /** 사진 가로 캐러셀. video가 있는 항목에는 없다 */
+  photos?: JourneyPhoto[];
+  /**
+   * 사진 대신 영상이 들어가는 항목 (졸업식).
+   * photos와 함께 주면 영상이 우선한다.
+   */
+  video?: GradVideo;
 };
 
 export type GradClosing = {

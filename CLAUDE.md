@@ -27,8 +27,8 @@ README 「구현 노트」의 함정 8건은 전부 프로토타입에서 실제
 
 - `100dvh` 사용 (`100vh` 아님) · body 배경은 `EV.backdrop`
 - 봉투 플랩에 `backface-visibility: hidden` 금지 → `transform-style: preserve-3d`
-- `scrollSnapType` 복원은 `'x mandatory'` 명시 (`''`로 지우면 스냅이 영구히 꺼짐)
-- 캐러셀은 `touch-action: pan-x pan-y`
+- 캐러셀 한 사이클은 `카드수 × stride`로 계산 (`scrollWidth/2`를 쓰면 padding이 끼어들어 매 바퀴 어긋남)
+- 무한 캐러셀은 `touch-action: pan-y` (가로는 JS가 전담)
 - `Reveal`의 `active` 게이트 (봉투 열리기 전 본문 애니메이션 소진 방지)
 - `EV.gold`는 24px 미만 텍스트 금지 → `EV.goldTx` / `FF.latin`에 한글 금지
 

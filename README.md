@@ -25,7 +25,8 @@
 | 사진 캐러셀 (터치/드래그/Shift+휠) | ✅ 구현 |
 | 졸업 일시 · 장소 | ✅ 2026-09-20 (일) 오후예배 14:30 · 다윗성전 |
 | 졸업생 명단 120명 | ⏳ placeholder (`김○○`) |
-| 여정 사진 30장 | ⏳ placeholder 슬롯 (`01`~`30`) |
+| 여정 사진 | ✅ 59장 배치 (입학식 23 · 하나로가족한마당 19 · 식사 모임 17)<br>⏳ **제자 수업만 placeholder** — 원본 미수령 |
+| 졸업식 영상 | ⏳ placeholder — 제자들이 목사님께 전하는 한마디 |
 | 졸업 간증 영상 | ⏳ placeholder 슬롯 |
 | 열람 기한 처리 | ❌ **구현 안 함** — 배포를 직접 내릴 때까지 상시 공개 (2026-09-07 결정) |
 | 어워드(시상) 섹션 | ⏳ 후속 과제 |
@@ -66,8 +67,8 @@
 |---|---|---|
 | — | **Envelope** | **진입**: 라벨 → 봉투 → 안내 문구 순으로 도착 (~1.55s)<br>**열기**: 화면 아무 곳이나 탭 → 플랩 `rotateX(-172°)` → 안쪽 카드 `-72%` 상승 → 오버레이 페이드아웃 (~2.0s) |
 | 01 | **Cover** | 금박 이중 프레임, `AMEN 17TH`, 대형 타이틀, 왁스 씰, 일시·장소 한 줄<br>하단에 스크롤 힌트 — 한 번이라도 스크롤하면 영구히 사라짐 |
-| 02 | **Testimony** | 9:16 세로 영상. URL이 없거나 로드 실패 시 placeholder 슬롯으로 폴백 |
-| 03 | **Our Journey** | 6개 시기 세로 타임라인 + 시기마다 사진 5장 가로 캐러셀 |
+| 02 | **Testimony** | 16:9 가로 영상. URL이 없거나 로드 실패 시 placeholder 슬롯으로 폴백 |
+| 03 | **Our Journey** | 5개 시기 세로 타임라인<br>입학식 → 제자 수업 → 하나로가족한마당 → 식사 모임 → **졸업식**<br>앞 4개는 **무한 가로 캐러셀**(마운트 시 셔플 · 자동 흐름 · 드래그 관성 · 탭하면 라이트박스), 졸업식은 **영상 슬롯** |
 | 04 | **Graduates** | 4열 이름 그리드 |
 | 05 | **Closing** | 느헤미야 8:6 · 겹낫표 · 푸터 |
 
@@ -84,7 +85,7 @@
 ├── FE/                                 # 프론트엔드 (Vite + React + Vercel)
 │   ├── public/
 │   │   ├── seal/wax-seal.png           # 왁스 씰 (360×300, 73KB)
-│   │   ├── journey/                    # 여정 사진 30장 (4:3) — 대기
+│   │   ├── journey/<slug>/             # 여정 사진 — thumb(320w) · full(1280w) 2벌
 │   │   ├── video/                      # 자체 호스팅 영상 — 대기 (git 제외)
 │   │   └── icons/                      # 카카오 공유용 thumbnail — 대기
 │   ├── src/
@@ -97,13 +98,14 @@
 │   │   │   └── graduation.ts           # 모든 정적 콘텐츠 (교체 지점)
 │   │   ├── hooks/
 │   │   │   ├── useReveal.ts            # IntersectionObserver + active 게이트
-│   │   │   ├── useDragScroll.ts        # 가로 캐러셀 조작 3종
 │   │   │   ├── useScrolled.ts          # 스크롤 여부 1회 판정 (힌트 숨김용)
+│   │   │   ├── useShuffled.ts          # 마운트 시 1회 셔플
 │   │   │   └── usePrefersReducedMotion.ts
 │   │   ├── components/
 │   │   │   ├── sections/               # Envelope, Cover, Testimony, Journey, Graduates, Closing
 │   │   │   └── common/                 # Section, Frame, Rule, SectionHead, Seal, PhotoRail,
-│   │   │                               #   Reveal, ScrollHint, ShareFAB, CornerOrnaments
+│   │   │                               #   Lightbox, VideoSlot, Reveal, ScrollHint,
+│   │   │                               #   ShareFAB, CornerOrnaments
 │   │   └── utils/
 │   │       ├── kakaoShare.ts           # Kakao SDK 로더 + sendScrap (OG 태그 기반)
 │   │       └── share.ts                # 정식 URL · 링크 복사 · 네이티브 공유 폴백
@@ -126,6 +128,9 @@
 │   │   └── README.md                   #   인덱스 + 작성 규칙
 │   └── memory/                         # 세션 간 유지되는 메모리
 │       └── MEMORY.md                   #   인덱스 + 작성 규칙
+│
+├── scripts/
+│   └── resize-photos.py                # 원본 사진 → thumb/full 2벌 생성
 │
 └── CLAUDE.md                           # 세션 시작 시 자동 로드되는 프로젝트 규약
 ```
@@ -191,7 +196,8 @@ npx vercel --prod         # 프로덕션 배포
 
 | 변수 | 용도 | 없을 때 |
 |---|---|---|
-| `VITE_VIDEO_URL` | 졸업 간증 영상 | placeholder 슬롯 표시 |
+| `VITE_TESTIMONY_VIDEO_URL` | 졸업 간증 영상 (§02) | placeholder 슬롯 표시 |
+| `VITE_GRADUATION_VIDEO_URL` | 졸업식 영상 (§03 여정 마지막) | placeholder 슬롯 표시 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
 
 > `VITE_KAKAO_JS_KEY`는 카카오 개발자 콘솔의 **JavaScript 키**이며, 앱 설정 → 플랫폼 → Web → 사이트 도메인에 `https://2026amen17graduation.vercel.app`을 **등록해야** 동작합니다.
@@ -226,7 +232,23 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 
 **졸업생 명단** — `roster` 배열을 실제 성함으로 교체. 4열 그리드라 개수 제한은 없습니다.
 
-**여정 사진** — 파일을 `FE/public/journey/`에 넣고 `journey[].photos[].image`에 경로를 지정합니다. `image`가 없으면 `tag` 번호 placeholder가 표시됩니다.
+**여정 사진** — 원본을 그대로 쓰지 않고 두 벌로 줄여서 넣습니다 (캐러셀 썸네일 320w · 라이트박스 1280w).
+
+```sh
+# 1) 원본 폴더를 레포 루트에 두고 scripts/resize-photos.py 의 FOLDERS 에 등록
+#    '제자수업': 'class'
+# 2) 실행 — FE/public/journey/<slug>/{thumb,full}/NN.jpg 로 생성됨
+pip install pillow
+python scripts/resize-photos.py
+```
+
+그다음 `graduation.ts`에서 장수만 바꿉니다. 파일명은 규칙으로 생성되므로 나열할 필요가 없습니다.
+
+```ts
+photos: photosOf("class", 12, "제자 수업")   // placeholderPhotos(...) 를 교체
+```
+
+첫 수령분 59장은 **95MB → 11.6MB**로 줄었습니다. 원본 폴더는 `.gitignore` 처리되어 커밋되지 않습니다.
 
 ```ts
 { caption: "개강 첫날", tag: "01", image: "/journey/01.jpg" }
@@ -237,7 +259,7 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 | 방식 | 방법 | 적합한 경우 |
 |---|---|---|
 | 저장소 직접 배치 | `FE/public/video/testimony.mp4` | 용량이 작을 때 |
-| **Vercel Blob** | `vercel blob put` 후 `VITE_VIDEO_URL`에 URL 지정 | 4분 세로 영상 등 용량이 클 때 (권장) |
+| **Vercel Blob** | `vercel blob put` 후 `VITE_*_VIDEO_URL`에 URL 지정 | 수 분짜리 세로 영상 등 용량이 클 때 (권장) |
 
 둘 다 없으면 재생 아이콘 placeholder가 표시됩니다.
 
@@ -274,8 +296,8 @@ EV.seal      = '#8C2B22'   // 포인트 (씰·영문 라벨·다이아몬드)
 1. **`100dvh` 사용** — `100vh`는 모바일 주소창 높이를 포함해 하단이 잘립니다. (`App.tsx`, `index.css`)
 2. **body 배경을 `EV.backdrop`과 일치** — 스크롤 바운스 시 다른 색이 노출됩니다. (`index.css`)
 3. **플랩에 `backface-visibility: hidden` 금지** — 172도 회전하면 뒷면이 되어 통째로 사라집니다. `transform-style: preserve-3d` + 안쪽 면용 그라데이션(`evFlapIn`) 교체로 처리. (`Envelope.tsx`)
-4. **`scrollSnapType` 복원은 `'x mandatory'`로 명시** — `''`로 지우면 인라인 스타일에만 있던 값이라 fallback CSS가 없어 스냅이 영구히 꺼집니다. (`useDragScroll.ts`)
-5. **`touch-action: pan-x pan-y`** — `pan-y`만 주면 네이티브 가로 터치 스크롤이 죽습니다. JS 드래그는 마우스 전용으로 분리(`pointerType === 'touch'` 제외). (`PhotoRail.tsx`, `useDragScroll.ts`)
+4. ~~**`scrollSnapType` 복원은 `'x mandatory'`로 명시**~~ — 네이티브 스크롤 + 스냅을 쓰던 시절의 규칙입니다. **2026-09-11 무한 캐러셀로 교체하며 `useDragScroll.ts`와 함께 사라졌습니다.** 다시 네이티브 스크롤을 쓰게 되면 되살아나는 함정이니 기록만 남깁니다.
+5. ~~**`touch-action: pan-x pan-y`**~~ — 네이티브 가로 스크롤을 쓰던 시절의 규칙입니다. **2026-09-11 무한 캐러셀로 교체하면서 `pan-y`가 맞게 되었습니다** — 가로 이동을 JS가 전담하므로 브라우저에는 세로만 넘깁니다. `pan-x`를 남기면 브라우저 제스처와 JS 드래그가 서로 싸웁니다. (`PhotoRail.tsx`)
 6. **봉투 안 카드에 `overflow: hidden`** — `aspect-ratio`를 줘도 flex 자식의 min-content 높이가 더 크면 넘칩니다. (`Envelope.tsx`)
 7. **`Reveal`의 `active` 게이트** — 봉투가 열리기 전에 본문 등장 애니메이션이 소진되지 않도록, `stage === 'out'`이 되기 전에는 IntersectionObserver 관찰 자체를 시작하지 않습니다. (`useReveal.ts`)
 8. **금색 텍스트 대비** — 위 「디자인 토큰」 경고 참조.
@@ -318,7 +340,8 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [x] ~~졸업 일시·장소 반영~~ — 2026-09-20 (일) 오후예배 14:30 · 다윗성전
 - [x] ~~Vercel 프로젝트 연결 · 프로덕션 배포~~ — 2026-09-07
 - [ ] 졸업생 실명 명단 반영
-- [ ] 여정 사진 30장 교체 (4:3 권장)
+- [ ] 제자 수업 사진 수령 후 배치 (현재 유일한 placeholder 시기)
+- [ ] 졸업식 영상 (§03) 업로드 — 졸업식 당일 이후
 - [ ] 졸업 간증 영상 업로드 및 연결
 - [ ] 카카오 공유용 `thumbnail.png` (800×800) 제작 — **현재 404, 공유 카드 이미지 없음**
 - [ ] `VITE_KAKAO_JS_KEY` 발급 + 도메인 등록 — 없으면 네이티브 공유로 폴백

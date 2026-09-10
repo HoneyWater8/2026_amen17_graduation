@@ -4,11 +4,44 @@
    ⚠️ 명단 · 사진 · 영상은 아직 placeholder — 확정 후 이 파일만 교체
    ───────────────────────────────────────────────────────── */
 
-import type { GraduationData } from './types';
+import type { GraduationData, JourneyPhoto } from './types';
 
-/** Vercel Blob 등 외부 URL이 있으면 우선, 없으면 저장소 자체 호스팅 경로 */
-const VIDEO_SRC = import.meta.env.VITE_VIDEO_URL || '/video/testimony.mp4';
-const VIDEO_POSTER = import.meta.env.VITE_VIDEO_POSTER || undefined;
+/* 영상 2종 — Vercel Blob 등 외부 URL이 있으면 우선, 없으면 저장소 자체 호스팅 경로.
+   둘 다 없으면 VideoSlot이 placeholder를 표시하므로 레이아웃은 무너지지 않는다. */
+
+/** 02 졸업 간증 영상 — 함께 졸업하지 못한 네 지체가 보내온 영상의 통합본 */
+const TESTIMONY_SRC = import.meta.env.VITE_TESTIMONY_VIDEO_URL || '/video/testimony.mp4';
+const TESTIMONY_POSTER = import.meta.env.VITE_TESTIMONY_VIDEO_POSTER || undefined;
+
+/** 03 여정 · 졸업식 — 제자들이 목사님께 한마디씩 전하는 영상 */
+const GRADUATION_SRC = import.meta.env.VITE_GRADUATION_VIDEO_URL || '/video/graduation.mp4';
+const GRADUATION_POSTER = import.meta.env.VITE_GRADUATION_VIDEO_POSTER || undefined;
+
+/**
+ * 시기별 사진 경로 생성.
+ *
+ * 원본을 `FE/public/journey/<slug>/{thumb,full}/NN.jpg` 규칙으로 미리 리사이즈해 두었으므로
+ * 파일명을 일일이 나열하지 않고 장수만 적는다. 사진을 더하거나 빼면 count만 고치면 된다.
+ * (원본 → 2벌 생성 절차는 README 「콘텐츠 교체 방법」 참고)
+ */
+function photosOf(slug: string, count: number, label: string): JourneyPhoto[] {
+  return Array.from({ length: count }, (_, i) => {
+    const n = String(i + 1).padStart(2, '0');
+    return {
+      caption: `${label} 사진 ${i + 1}`,
+      thumb: `/journey/${slug}/thumb/${n}.jpg`,
+      full: `/journey/${slug}/full/${n}.jpg`,
+    };
+  });
+}
+
+/** 사진이 아직 없는 시기 — 번호 placeholder만 채운다 */
+function placeholderPhotos(count: number, label: string): JourneyPhoto[] {
+  return Array.from({ length: count }, (_, i) => ({
+    caption: `${label} 사진 ${i + 1}`,
+    tag: String(i + 1).padStart(2, '0'),
+  }));
+}
 
 export const G: GraduationData = {
   meta: {
@@ -39,8 +72,8 @@ export const G: GraduationData = {
 
   // 졸업 간증 영상 — 함께 졸업하지 못한 네 지체의 영상을 하나로 엮은 통합본 1개
   video: {
-    src: VIDEO_SRC,
-    poster: VIDEO_POSTER,
+    src: TESTIMONY_SRC,
+    poster: TESTIMONY_POSTER,
     dur: "약 4분",
     desc: "네 지체의 이야기를 하나로 엮은 영상입니다.",
     note: "영상은 확정 후 업로드됩니다"
@@ -49,52 +82,33 @@ export const G: GraduationData = {
   // 함께 걸어온 길 — 시기별 6개 항목, 각 항목마다 가로 캐러셀 사진 5장
   journey: [
     {
-      period: "2025 · 봄", title: "개강", desc: "17기의 첫 만남과 입학",
-      photos: [
-        { caption: "개강 첫날", tag: "01" }, { caption: "첫 소그룹", tag: "02" },
-        { caption: "환영의 자리", tag: "03" }, { caption: "오리엔테이션", tag: "04" },
-        { caption: "첫 예배", tag: "05" }
-      ]
+      period: "2026 · 03", title: "입학식",
+      photos: photosOf("entrance", 23, "입학식")
     },
     {
-      period: "2025 · 여름", title: "첫 수련회", desc: "함께 기도하며 하나 된 시간",
-      photos: [
-        { caption: "수련회", tag: "06" }, { caption: "저녁 집회", tag: "07" },
-        { caption: "조별 나눔", tag: "08" }, { caption: "새벽 기도", tag: "09" },
-        { caption: "야외 활동", tag: "10" }
-      ]
+      // 사진 미수령 — 확보되면 photosOf("class", <장수>, "제자 수업")으로 교체
+      period: "2026", title: "제자 수업",
+      photos: placeholderPhotos(5, "제자 수업")
     },
     {
-      period: "2025 · 가을", title: "제자 수업", desc: "말씀 앞에 앉아 배우던 나날",
-      photos: [
-        { caption: "제자 수업", tag: "11" }, { caption: "과제 발표", tag: "12" },
-        { caption: "말씀 묵상", tag: "13" }, { caption: "성경 통독", tag: "14" },
-        { caption: "함께한 토론", tag: "15" }
-      ]
+      period: "2026 · 06", title: "하나로가족한마당",
+      photos: photosOf("festival", 19, "하나로가족한마당")
     },
     {
-      period: "2026 · 봄", title: "섬김과 사역", desc: "배운 것을 삶으로 옮기며",
-      photos: [
-        { caption: "섬김의 자리", tag: "16" }, { caption: "봉사 현장", tag: "17" },
-        { caption: "함께한 식탁", tag: "18" }, { caption: "전도 훈련", tag: "19" },
-        { caption: "중보 기도", tag: "20" }
-      ]
+      period: "2026", title: "식사 모임",
+      photos: photosOf("fellowship", 17, "식사 모임")
     },
     {
-      period: "2026 · 여름", title: "하나로 가족한마당", desc: "온 교우와 함께 만든 하루",
-      photos: [
-        { caption: "가족한마당", tag: "21" }, { caption: "부스 운영", tag: "22" },
-        { caption: "단체 사진", tag: "23" }, { caption: "체육 대회", tag: "24" },
-        { caption: "나눔의 시간", tag: "25" }
-      ]
-    },
-    {
-      period: "2026 · 09", title: "졸업 예배", desc: "완주를 축하하는 자리", now: true,
-      photos: [
-        { caption: "졸업 예배", tag: "26" }, { caption: "기도의 시간", tag: "27" },
-        { caption: "다시, 시작", tag: "28" }, { caption: "축하의 자리", tag: "29" },
-        { caption: "함께 남긴 사진", tag: "30" }
-      ]
+      // 아직 치르지 않은 일정이라 사진이 없다. 제자들이 목사님께 한마디씩 전하는
+      // 영상이 들어갈 자리로 둔다.
+      period: "2026 · 09", title: "졸업식",
+      desc: "제자들이 담임목사님께 전하는 한마디", now: true,
+      video: {
+        src: GRADUATION_SRC,
+        poster: GRADUATION_POSTER,
+        dur: "",
+        note: "졸업식 후 업로드됩니다"
+      }
     }
   ],
 
