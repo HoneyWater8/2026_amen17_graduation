@@ -49,7 +49,11 @@ export function initAnalytics() {
   const send = gtag as NonNullable<Window['gtag']>;
   window.gtag = send;
   send('js', new Date());
-  send('config', GA_ID);
+
+  // ?ga_debug=1 로 들어오면 DebugView에 실시간으로 찍힌다. 수집이 되는지 확인할 때 쓴다.
+  // 재배포 없이 URL만으로 켜고 끌 수 있도록 쿼리 파라미터로 둔다.
+  const debug = new URLSearchParams(window.location.search).has('ga_debug');
+  send('config', GA_ID, debug ? { debug_mode: true } : {});
 }
 
 /**
