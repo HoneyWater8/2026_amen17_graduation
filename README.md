@@ -26,6 +26,7 @@
 | 졸업 일시 · 장소 | ✅ 2026-09-20 (주) 오후예배 14:30 · 다윗성전 |
 | 졸업생 명단 120명 | ⏳ placeholder (`김○○`) |
 | 여정 사진 | ✅ 59장 배치 (입학식 23 · 하나로가족한마당 19 · 식사 모임 17)<br>⏳ **제자 수업만 placeholder** — 원본 미수령 |
+| 공유 썸네일 · 탭 아이콘 | ✅ 1200×630 썸네일, 왁스 씰 favicon |
 | 졸업식 영상 | ⏳ placeholder — 제자들이 목사님께 전하는 한마디 |
 | 졸업 간증 영상 | ⏳ placeholder 슬롯 |
 | 열람 기한 처리 | ❌ **구현 안 함** — 배포를 직접 내릴 때까지 상시 공개 (2026-09-07 결정) |
@@ -87,7 +88,7 @@
 │   │   ├── seal/wax-seal.png           # 왁스 씰 (360×300, 73KB)
 │   │   ├── journey/<slug>/             # 여정 사진 — thumb(320w) · full(1280w) 2벌
 │   │   ├── video/                      # 자체 호스팅 영상 — 대기 (git 제외)
-│   │   └── icons/                      # 카카오 공유용 thumbnail — 대기
+│   │   └── icons/                      # thumbnail(공유 카드) · favicon · apple-touch-icon
 │   ├── src/
 │   │   ├── App.tsx                     # 봉투 stage + 2레이어 조립
 │   │   ├── main.tsx
@@ -200,7 +201,12 @@ npx vercel --prod         # 프로덕션 배포
 | `VITE_GRADUATION_VIDEO_URL` | 졸업식 영상 (§03 여정 마지막) | placeholder 슬롯 표시 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
 
-> `VITE_KAKAO_JS_KEY`는 카카오 개발자 콘솔의 **JavaScript 키**이며, 앱 설정 → 플랫폼 → Web → 사이트 도메인에 `https://2026amen17graduation.vercel.app`을 **등록해야** 동작합니다.
+> `VITE_KAKAO_JS_KEY`는 카카오 개발자 콘솔의 **JavaScript 키**입니다. 키만으로는 동작하지 않고, 콘솔에 배포 도메인을 등록해야 합니다.
+>
+> **[앱] → 제품 링크 관리 → 사이트 도메인** 에 `https://2026amen17graduation.vercel.app` 추가.
+> 「앱 설정 → 플랫폼 → Web」에도 도메인 입력란이 있지만 **공유 기능이 보는 곳은 제품 링크 관리**입니다.
+> 빠지면 공유 버튼을 눌렀을 때 `4019 잘못된 요청으로 인증에 실패` 오류가 납니다 (2026-09-11 실제로 겪음).
+> 와일드카드는 지원하지 않으므로 프리뷰 URL이나 `http://localhost:5173`도 쓰려면 따로 등록해야 합니다.
 
 ```sh
 npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 가져오기
@@ -216,7 +222,8 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 ```
 
 - ✅ **도메인 일치 확인 완료** — 프로덕션 별칭이 `https://2026amen17graduation.vercel.app` 로 잡혀 하드코딩 값과 같습니다. 도메인을 바꾸면 `og:url` · `og:image` · `twitter:image` 세 곳을 함께 교체하세요.
-- ❌ **`public/icons/thumbnail.png`(800×800)가 아직 없습니다** — `/icons/thumbnail.png` 요청이 404입니다. 카카오톡 공유 카드에 이미지가 뜨지 않습니다.
+- ✅ **`public/icons/thumbnail.png`** — 1200×630 (1.91:1). 정사각형은 카카오톡에서 작은 썸네일로 붙어 눈에 덜 띕니다.
+- ⚠️ **카카오는 OG 이미지를 URL 단위로 캐싱합니다.** 같은 경로에 파일만 바꾸면 옛 이미지가 계속 나갑니다. [공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에서 캐시를 초기화하거나, 확실히 하려면 파일명을 바꾸고 `og:image`도 함께 고치세요.
 
 ### 운영 정책
 
@@ -343,8 +350,8 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [ ] 제자 수업 사진 수령 후 배치 (현재 유일한 placeholder 시기)
 - [ ] 졸업식 영상 (§03) 업로드 — 졸업식 당일 이후
 - [ ] 졸업 간증 영상 업로드 및 연결
-- [ ] 카카오 공유용 `thumbnail.png` (800×800) 제작 — **현재 404, 공유 카드 이미지 없음**
-- [ ] `VITE_KAKAO_JS_KEY` 발급 + 도메인 등록 — 없으면 네이티브 공유로 폴백
+- [x] ~~카카오 공유용 `thumbnail.png` 제작~~ — 1200×630, 2026-09-11
+- [x] ~~`VITE_KAKAO_JS_KEY` 발급 + 도메인 등록~~ — 2026-09-11 완료
 - [ ] `public/icons/kakaotalk.png` (20×20 이상) — 없으면 인라인 SVG 말풍선으로 폴백
 - [ ] 폰트 자체 호스팅 + 서브셋 (Google Fonts 의존 제거)
 - [ ] 어워드(시상) 섹션 — 디자인 1단계에서 보류된 후속 과제
