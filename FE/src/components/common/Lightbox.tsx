@@ -12,6 +12,52 @@ const DRAG_FOLLOW = 0.5;
 const WHEEL_COOLDOWN = 320;
 /** 이만큼 움직여야 드래그로 인정. 그 전에는 버튼 탭을 방해하지 않는다 */
 const DRAG_THRESHOLD = 8;
+/** 닫힘 애니메이션 길이(ms). 이 시간 뒤에 실제로 언마운트한다 */
+const CLOSE_MS = 200;
+
+/**
+ * 썸네일을 먼저 깔아 크기를 확정하고, 원본이 로드되면 그 위에 겹쳐 보여준다.
+ *
+ * 원본만 넣으면 로드 전 컨테이너 크기가 0이라 위에 얹힌 버튼들이 한곳에 뭉친다.
+ * 썸네일은 캐러셀에서 이미 받아둔 것이라 캐시에서 즉시 그려진다.
+ */
+function LightboxImage({ photo }: { photo: JourneyPhoto }) {
+  const [loaded, setLoaded] = useState(false);
+  const maxH = 'calc(100dvh - 38px)';
+
+  return (
+    <>
+      <img
+        src={photo.thumb ?? photo.full}
+        alt={photo.caption}
+        draggable={false}
+        style={{
+          display: 'block', verticalAlign: 'bottom',
+          // 썸네일은 320w라 width:auto로 두면 그 크기대로만 그려져 양옆이 빈다.
+          // 폭을 채우고 높이는 비율대로 따라오게 한다.
+          width: '100%', height: 'auto', maxHeight: maxH,
+          objectFit: 'contain',
+          // 확대한 저해상도라 또렷하지 않다. 살짝 흐려 티를 덜 낸다.
+          filter: loaded ? 'none' : 'blur(6px)',
+        }}
+      />
+      <img
+        src={photo.full}
+        alt=""
+        aria-hidden
+        draggable={false}
+        onLoad={() => setLoaded(true)}
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'contain', display: 'block',
+          opacity: loaded ? 1 : 0,
+          transition: 'opacity .25s ease',
+        }}
+      />
+    </>
+  );
+}
 
 type LightboxProps = {
   photos: JourneyPhoto[];
@@ -37,14 +83,30 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
 
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const closeTimerRef = useRef<number | null>(null);
   const startXRef = useRef(0);
   const downRef = useRef(false);
   const wheelAtRef = useRef(0);
 
   const close = useCallback(() => {
-    setDragX(0);
-    onClose();
-  }, [onClose]);
+    if (reduced) {
+      setDragX(0);
+      onClose();
+      return;
+    }
+    // 애니메이션을 보여준 뒤에 언마운트한다. 곧바로 onClose를 부르면 즉시 사라진다.
+    setClosing(true);
+    closeTimerRef.current = window.setTimeout(() => {
+      setClosing(false);
+      setDragX(0);
+      onClose();
+    }, CLOSE_MS);
+  }, [onClose, reduced]);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
+  }, []);
 
   const go = useCallback((delta: number) => {
     if (index === null) return;
@@ -142,7 +204,13 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
         backdropFilter: 'blur(7px)', WebkitBackdropFilter: 'blur(7px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 18,
-        animation: reduced ? undefined : 'ev-lightbox-in .22s ease backwards',
+        // 닫는 중에는 입력을 받지 않는다 (중복 클릭 방지)
+        pointerEvents: closing ? 'none' : 'auto',
+        animation: reduced
+          ? undefined
+          : closing
+            ? `ev-lightbox-out ${CLOSE_MS}ms ease forwards`
+            : 'ev-lightbox-in .22s ease backwards',
       }}
     >
       {/* 모달 — 사진 비율 그대로. 테두리와 버튼이 사진 가장자리에 붙는다 */}
@@ -157,8 +225,8 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
           // 크기를 고정하지 않고 사진에 맞춘다. 4:3 틀에 넣으면 비율이 다른 사진에
           // 위아래 검은 여백이 생긴다.
           position: 'relative',
-          display: 'inline-block',
-          maxWidth: '100%', maxHeight: '100%',
+          // inline-block(shrink-to-fit)이면 자식의 width:100%를 계산할 수 없다.
+          width: '100%', maxHeight: '100%',
           border: `1px solid ${EV.gold}`,
           boxShadow: '0 20px 50px rgba(0,0,0,.45)',
           // 세로 스크롤은 페이지에 넘기고 가로 제스처만 받는다.
@@ -167,23 +235,15 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
           userSelect: 'none', WebkitUserSelect: 'none',
           transform: `translateX(${dragX}px)`,
           transition: dragging ? 'none' : 'transform .25s cubic-bezier(.22,1,.36,1)',
-          animation: reduced ? undefined : 'ev-modal-in .28s cubic-bezier(.22,1,.36,1) backwards',
+          animation: reduced
+            ? undefined
+            : closing
+              ? `ev-modal-out ${CLOSE_MS}ms ease forwards`
+              : 'ev-modal-in .28s cubic-bezier(.22,1,.36,1) backwards',
         }}
       >
-        <img
-          key={photo.full}
-          src={photo.full}
-          alt={photo.caption}
-          draggable={false}
-          style={{
-            display: 'block', verticalAlign: 'bottom',
-            maxWidth: '100%',
-            // 화면 높이에서 backdrop 패딩(18px x 2)과 테두리를 뺀 만큼이 상한.
-            maxHeight: 'calc(100dvh - 38px)',
-            width: 'auto', height: 'auto',
-            animation: reduced ? undefined : 'ev-lightbox-in .2s ease backwards',
-          }}
-        />
+        {/* key로 리마운트시켜 사진이 바뀔 때 로딩 상태를 초기화한다 */}
+        <LightboxImage key={photo.full} photo={photo} />
 
         <button onClick={close} onPointerDown={stopDrag} aria-label="닫기" style={{
           position: 'absolute', top: 8, right: 8,
