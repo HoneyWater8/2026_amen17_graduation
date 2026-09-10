@@ -10,6 +10,8 @@ const SWIPE_THRESHOLD = 55;
 const DRAG_FOLLOW = 0.5;
 /** 휠 한 번에 여러 장이 넘어가지 않도록 두는 쿨다운(ms) */
 const WHEEL_COOLDOWN = 320;
+/** 이만큼 움직여야 드래그로 인정. 그 전에는 버튼 탭을 방해하지 않는다 */
+const DRAG_THRESHOLD = 8;
 
 type LightboxProps = {
   photos: JourneyPhoto[];
@@ -36,6 +38,7 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startXRef = useRef(0);
+  const downRef = useRef(false);
   const wheelAtRef = useRef(0);
 
   const close = useCallback(() => {
@@ -66,19 +69,30 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
 
   const many = photos.length > 1;
 
+  // ⚠️ pointerdown에서 곧바로 setPointerCapture를 부르면 안 된다.
+  //    포인터가 모달에 캡처되어 위에 얹힌 버튼들이 click을 받지 못한다.
+  //    임계값을 넘어 실제로 끌기 시작할 때만 캡처한다 (PhotoRail과 같은 방식).
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!many || e.button !== 0) return;
     startXRef.current = e.clientX;
-    setDragging(true);
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* noop */ }
+    downRef.current = true;
   };
 
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (!dragging) return;
-    setDragX((e.clientX - startXRef.current) * DRAG_FOLLOW);
+    if (!downRef.current) return;
+    const dx = e.clientX - startXRef.current;
+    if (!dragging) {
+      if (Math.abs(dx) < DRAG_THRESHOLD) return;
+      setDragging(true);
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* noop */ }
+    }
+    setDragX(dx * DRAG_FOLLOW);
   };
 
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!downRef.current) return;
+    downRef.current = false;
+    // 임계값을 못 넘었으면 탭이다 — 버튼 click이 그대로 발생하도록 둔다.
     if (!dragging) return;
     setDragging(false);
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* noop */ }
@@ -87,6 +101,9 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
     else if (dx < -SWIPE_THRESHOLD) go(1);
     else setDragX(0);
   };
+
+  // 버튼 위에서 시작한 포인터는 드래그로 취급하지 않는다.
+  const stopDrag = (e: ReactPointerEvent<HTMLButtonElement>) => e.stopPropagation();
 
   // 트랙패드 가로 스크롤. 연속으로 들어오므로 쿨다운을 두어 한 장씩만 넘긴다.
   const onWheel = (e: ReactWheelEvent<HTMLDivElement>) => {
@@ -168,7 +185,7 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
           }}
         />
 
-        <button onClick={close} aria-label="닫기" style={{
+        <button onClick={close} onPointerDown={stopDrag} aria-label="닫기" style={{
           position: 'absolute', top: 8, right: 8,
           width: 32, height: 32, border: 'none', borderRadius: '50%',
           background: 'rgba(251,247,238,.82)', color: EV.ink,
@@ -185,6 +202,7 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
           <>
             <button
               onClick={() => go(-1)}
+              onPointerDown={stopDrag}
               aria-label="이전 사진"
               style={{ ...navStyle, left: 8, transform: 'translateY(-50%)' }}
             >
@@ -194,6 +212,7 @@ export function Lightbox({ photos, index, onClose, onMove }: LightboxProps) {
             </button>
             <button
               onClick={() => go(1)}
+              onPointerDown={stopDrag}
               aria-label="다음 사진"
               style={{ ...navStyle, right: 8, transform: 'translateY(-50%)' }}
             >
