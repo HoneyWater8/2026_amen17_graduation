@@ -76,7 +76,7 @@ export const G: GraduationData = {
     poster: TESTIMONY_POSTER,
     dur: "약 4분",
     desc: "네 지체의 이야기를 하나로 엮은 영상입니다.",
-    note: "영상은 확정 후 업로드됩니다"
+    note: "준비중 입니다"
   },
 
   // 함께 걸어온 길 — 시기별 6개 항목, 각 항목마다 가로 캐러셀 사진 5장
@@ -107,7 +107,7 @@ export const G: GraduationData = {
         src: GRADUATION_SRC,
         poster: GRADUATION_POSTER,
         dur: "",
-        note: "졸업식 후 업로드됩니다"
+        note: "준비중 입니다"
       }
     }
   ],
