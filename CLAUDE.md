@@ -31,7 +31,7 @@ README 「구현 노트」의 함정 8건은 전부 프로토타입에서 실제
 - 무한 캐러셀은 `touch-action: pan-y` (가로는 JS가 전담)
 - `Reveal`의 `active` 게이트 (봉투 열리기 전 본문 애니메이션 소진 방지)
 - `EV.gold`는 24px 미만 텍스트 금지 → `EV.goldTx` / `FF.latin`에 한글 금지
-- gtag는 `arguments` 객체를 push (화살표+rest로 바꾸면 배열이 들어가 이벤트가 전송되지 않음)
+- GA4 초기화는 `index.html`의 구글 표준 스니펫 그대로 둘 것 (모듈로 감싸 동적 로드하면 `page_view`가 `en` 없이 나가 GA가 버림)
 - `setPointerCapture`는 드래그 임계값을 넘은 뒤에 (pointerdown 즉시 부르면 위에 얹힌 버튼이 click을 못 받음)
 - 오버레이는 `position: fixed` (`absolute`면 조상 `Section`에 갇혀 섹션 전체를 덮음)
 - `animation-fill-mode` — 진입은 `backwards`(끝나고 인라인 스타일 복귀), 닫힘은 `forwards`(마지막 프레임 유지)
