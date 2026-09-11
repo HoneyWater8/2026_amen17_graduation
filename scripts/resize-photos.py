@@ -8,8 +8,12 @@
     thumb   320w   카드 폭 128px x DPR 2배 여유
     full   1280w   루트 폭 460px x DPR 2~3배
 
+첫 수령분 59장은 2026-09-11 처리 후 원본 폴더를 삭제했다(레포에 리사이즈본만 남음).
+새 사진을 받았을 때 다시 쓰는 스크립트다.
+
 사용법:
-    1) 원본 폴더를 레포 루트에 두고 FOLDERS에 <한글 폴더명>: <영문 slug> 등록
+    1) 원본 폴더를 레포 루트에 두고 SRC·FOLDERS를 맞춘다
+       (SRC 기본값은 첫 수령분 폴더명이므로 새 폴더명으로 바꿀 것)
     2) pip install pillow
     3) python scripts/resize-photos.py
     4) FE/src/data/graduation.ts 의 photosOf("<slug>", <장수>, "<라벨>") 갱신
