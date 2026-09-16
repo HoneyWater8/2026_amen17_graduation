@@ -8,7 +8,7 @@
 - [참고 레포 · 2026 하나로 가족 한마당](./reference-repo-hanaro-festival.md) — 구조·컨벤션의 출처. 로컬 경로 포함
 - [이전 프로젝트 컨벤션 답습 선호](./prefers-mirroring-prior-project.md) — 새 구조를 발명하지 말 것
 - [관습적·담백한 UI 선호](./prefers-plain-conventional-ui.md) — 장식을 더하지 말고 먼저 제안할 것
-- [자산 파이프라인](./asset-pipeline.md) — 사진 재생성 · 로컬 영상 10개 · 초원별 연결 대기 · 참고 이미지 위치. 원본은 커밋하지 않음
+- [자산 파이프라인](./asset-pipeline.md) — 원본 10개·재생본 10개 로컬 보관 · 감사 파일명 청년-06 확정 · 화면 연결 대기. 영상 파일은 커밋하지 않음
 - [사용자 집계 설정](./analytics-setup.md) — Vercel+GA4 두 축. GA4는 HTML 스니펫으로 초기화. **2026-10 중순 전에 Vercel 대시보드 캡처 필요**
 - [카카오 앱 설정](./kakao-app-setup.md) — 도메인은 「제품 링크 관리」에 등록. 플랫폼>Web 아님
 - [Vercel 배포 설정과 함정](./vercel-deploy-setup.md) — 계정·프로젝트 정보 + FE/ 하위 구조 때문에 생기는 함정 4가지

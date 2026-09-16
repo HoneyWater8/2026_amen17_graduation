@@ -27,6 +27,6 @@ dist-ssr
 .env*
 !.env.example
 
-# 자체 호스팅 영상 원본 (용량 큼 — Vercel Blob 사용 시 업로드만 하고 커밋하지 않음)
+# 재생용 영상 (원본은 루트 assets/video-originals/, 배포용 URL 업로드는 별도)
 public/video/*
 !public/video/.gitkeep
