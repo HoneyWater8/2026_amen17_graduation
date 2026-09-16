@@ -8,7 +8,7 @@ import { G } from '../../data/graduation';
 
 type JourneyProps = { active: boolean };
 
-/** 03 함께 걸어온 길 — 시기별 6개 항목, 각 시기마다 그때 사진을 가로로 넘겨본다. */
+/** 03 함께 걸어온 길 — 시기별 사진 캐러셀과 졸업식 영상을 타임라인으로 표시한다. */
 export function Journey({ active }: JourneyProps) {
   return (
     <Section label="03 Our Journey" bg={EV.paper}>

@@ -32,7 +32,6 @@ FOLDERS = {
     '입학식': 'entrance',
     '하나로가족한마당': 'festival',
     '식사모임': 'fellowship',
-    # 제자 수업 사진은 아직 미수령 — 확보되면 '제자수업': 'class' 를 추가한다
 }
 
 THUMB_W, FULL_W = 320, 1280

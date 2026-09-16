@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────
    아멘 제자 17기 졸업 · 초대장 콘텐츠
    일시·장소 확정 — 2026-09-20 (주) 오후예배 14:30 · 다윗성전
-   명단 128명 · 여정 사진 59장 반영. 초원별 영상은 연결 전까지 준비 안내 표시.
+   명단 128명 · 여정 사진 60장 반영. 초원별 영상은 연결 전까지 준비 안내 표시.
    ───────────────────────────────────────────────────────── */
 
 import type { GraduationData, JourneyPhoto, TestimonyGroup } from './types';
@@ -35,14 +35,6 @@ function photosOf(slug: string, count: number, label: string): JourneyPhoto[] {
       full: `/journey/${slug}/full/${n}.jpg`,
     };
   });
-}
-
-/** 사진이 아직 없는 시기 — 번호 placeholder만 채운다 */
-function placeholderPhotos(count: number, label: string): JourneyPhoto[] {
-  return Array.from({ length: count }, (_, i) => ({
-    caption: `${label} 사진 ${i + 1}`,
-    tag: String(i + 1).padStart(2, '0'),
-  }));
 }
 
 export const G: GraduationData = {
@@ -91,16 +83,11 @@ export const G: GraduationData = {
     ],
   },
 
-  // 함께 걸어온 길 — 시기별 6개 항목, 각 항목마다 가로 캐러셀 사진 5장
+  // 함께 걸어온 길 — 사진 캐러셀 3개 시기와 졸업식 영상
   journey: [
     {
       period: "2026 · 03", title: "입학식",
       photos: photosOf("entrance", 23, "입학식")
-    },
-    {
-      // 사진 미수령 — 확보되면 photosOf("class", <장수>, "제자 수업")으로 교체
-      period: "2026", title: "제자 수업",
-      photos: placeholderPhotos(5, "제자 수업")
     },
     {
       period: "2026 · 06", title: "하나로가족한마당",
@@ -108,7 +95,7 @@ export const G: GraduationData = {
     },
     {
       period: "2026", title: "식사 모임",
-      photos: photosOf("fellowship", 17, "식사 모임")
+      photos: photosOf("fellowship", 18, "식사 모임")
     },
     {
       // 아직 치르지 않은 일정이라 사진이 없다. 제자들이 목사님께 한마디씩 전하는
