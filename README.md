@@ -8,15 +8,15 @@
 
 봉투를 눌러 열면 졸업장 톤의 세로 스크롤 본문이 드러나는 단일 페이지. 카카오톡으로 링크를 공유해 전 교인이 열람하는 것이 목적이며, **모바일 세로 화면이 기본 환경**입니다.
 
-이 페이지의 중심 콘텐츠는 **함께 졸업하지 못한 네 지체**(군 복무 2 · 유학 부부 1 · 온라인 예배 1)가 보내온 영상을 하나로 엮은 졸업 간증 영상입니다. 자세한 배경은 [`docs/requirements.md`](./docs/requirements.md) 참고.
+이 페이지의 중심 콘텐츠는 **10개 초원의 졸업 간증 영상**입니다. 초원별 영상과 이름을 2열 × 5행으로 표시합니다. 최초 기획 배경과 변경 사항은 [`docs/requirements.md`](./docs/requirements.md) 참고.
 
 ---
 
 ## 현재 상태
 
-**구조 스캐폴딩 + 디자인 구현 완료. 실제 콘텐츠 대기 중.**
+**디자인 구현 · 명단과 여정 사진 반영 완료. 초원별 영상 연결 대기 중.**
 
-디자인은 hifi(색·타이포·간격·모션 타이밍 확정)로 확정되어 그대로 구현되어 있으나, 명단·사진·영상·날짜는 전부 placeholder입니다. 자료가 확정되면 [`FE/src/data/graduation.ts`](./FE/src/data/graduation.ts) 한 파일 교체로 반영됩니다.
+졸업 일시·장소, 명단 128명, 여정 사진 59장이 반영되어 있습니다. 초원명과 영상 등 콘텐츠는 [`FE/src/data/graduation.ts`](./FE/src/data/graduation.ts)에서 변경합니다.
 
 | 항목 | 상태 |
 |---|---|
@@ -28,7 +28,7 @@
 | 여정 사진 | ✅ 59장 배치 (입학식 23 · 하나로가족한마당 19 · 식사 모임 17)<br>⏳ **제자 수업만 placeholder** — 원본 미수령 |
 | 공유 썸네일 · 탭 아이콘 | ✅ 1200×630 썸네일, 왁스 씰 favicon |
 | 졸업식 영상 | ⏳ placeholder — 제자들이 목사님께 전하는 한마디 |
-| 졸업 간증 영상 | ⏳ placeholder 슬롯 |
+| 졸업 간증 영상 | ✅ 초원별 10개 카드 (2열 × 5행), 실제 초원명 반영<br>⏳ 영상 연결 대기 |
 | 열람 기한 처리 | ❌ **구현 안 함** — 배포를 직접 내릴 때까지 상시 공개 (2026-09-07 결정) |
 | 어워드(시상) 섹션 | ⏳ 후속 과제 |
 
@@ -68,7 +68,7 @@
 |---|---|---|
 | — | **Envelope** | **진입**: 라벨 → 봉투 → 안내 문구 순으로 도착 (~1.55s)<br>**열기**: 화면 아무 곳이나 탭 → 플랩 `rotateX(-172°)` → 안쪽 카드 `-72%` 상승 → 오버레이 페이드아웃 (~2.0s) |
 | 01 | **Cover** | 금박 이중 프레임, `AMEN 17TH`, 대형 타이틀, 왁스 씰, 일시·장소 한 줄<br>하단에 스크롤 힌트 — 한 번이라도 스크롤하면 영구히 사라짐 |
-| 02 | **Testimony** | 16:9 가로 영상. URL이 없거나 로드 실패 시 placeholder 슬롯으로 폴백 |
+| 02 | **Testimony** | 초원별 16:9 영상 10개, 2열 × 5행. 각 영상 아래 초원명 표시. URL이 없거나 로드 실패 시 해당 카드만 준비 안내로 폴백 |
 | 03 | **Our Journey** | 5개 시기 세로 타임라인<br>입학식 → 제자 수업 → 하나로가족한마당 → 식사 모임 → **졸업식**<br>앞 4개는 **무한 가로 캐러셀**(마운트 시 셔플 · 자동 흐름 · 드래그 관성 · 탭하면 라이트박스), 졸업식은 **영상 슬롯** |
 | 04 | **Graduates** | 4열 이름 그리드 |
 | 05 | **Closing** | 느헤미야 8:6 · 겹낫표 · 푸터 |
@@ -193,11 +193,12 @@ npx vercel --prod         # 프로덕션 배포
 
 ### 환경 변수
 
-필수 환경 변수는 **없습니다.** 둘 다 없어도 페이지는 정상 동작하며, 준비되는 대로 등록하면 됩니다 (자세한 내용은 `FE/.env.example`).
+필수 환경 변수는 **없습니다.** 등록하지 않아도 페이지는 정상 동작하며, 준비되는 대로 등록하면 됩니다 (자세한 내용은 `FE/.env.example`).
 
 | 변수 | 용도 | 없을 때 |
 |---|---|---|
-| `VITE_TESTIMONY_VIDEO_URL` | 졸업 간증 영상 (§02) | placeholder 슬롯 표시 |
+| `VITE_TESTIMONY_1_VIDEO_URL` ~ `VITE_TESTIMONY_10_VIDEO_URL` | 초원별 졸업 간증 영상 (§02) | 해당 카드에 준비 안내 표시 |
+| `VITE_TESTIMONY_1_VIDEO_POSTER` ~ `VITE_TESTIMONY_10_VIDEO_POSTER` | 초원별 영상 포스터 (선택) | 검은 배경 |
 | `VITE_GRADUATION_VIDEO_URL` | 졸업식 영상 (§03 여정 마지막) | placeholder 슬롯 표시 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
 
@@ -244,7 +245,7 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 |---|---|
 | `envelope_open` | 봉투를 눌러 열었을 때 |
 | `section_view` | 섹션이 40% 이상 보였을 때 (`section` = `01 Cover` 등). 왕복해도 1회만 |
-| `video_play` | 영상 재생 (`video` = `testimony` / `graduation`) |
+| `video_play` | 영상 재생 (`video` = `testimony-1` ~ `testimony-10` / `graduation`). 초원별로 구분하여 집계 |
 | `photo_open` | 사진 카드를 눌러 확대 |
 | `share_open` · `share_kakao` · `share_native` · `share_copy` | 공유 시트 열기와 각 경로 |
 
@@ -288,14 +289,16 @@ photos: photosOf("class", 12, "제자 수업")   // placeholderPhotos(...) 를 �
 { caption: "개강 첫날", tag: "01", image: "/journey/01.jpg" }
 ```
 
-**졸업 간증 영상** — 두 가지 방식 중 선택 (자세한 절차는 `FE/.env.example`):
+**졸업 간증 영상** — `G.testimony.groups`에 10개 초원이 등록되어 있습니다. `testimonyOf()`의 두 번째 인자는 표시명이며, 배열 순서대로 왼쪽부터 배치합니다. 첫 번째 인자는 재생 집계용 고정 번호이므로 초원명을 바꾸어도 유지합니다.
+
+영상 연결은 초원별로 지정합니다 (예: 초원 1은 `VITE_TESTIMONY_1_VIDEO_URL`, 자세한 설정은 `FE/.env.example`).
 
 | 방식 | 방법 | 적합한 경우 |
 |---|---|---|
-| 저장소 직접 배치 | `FE/public/video/testimony.mp4` | 용량이 작을 때 |
-| **Vercel Blob** | `vercel blob put` 후 `VITE_*_VIDEO_URL`에 URL 지정 | 수 분짜리 세로 영상 등 용량이 클 때 (권장) |
+| 로컬 파일 | `FE/public/video/` 아래에 두고 해당 초원의 URL을 `/video/파일명.mp4`로 지정 | 로컬 확인 (`public/video/*`는 git 제외) |
+| **외부 호스팅 (Vercel Blob 등)** | 영상 업로드 후 해당 초원의 URL에 공개 주소 지정 | 배포용 영상 |
 
-둘 다 없으면 재생 아이콘 placeholder가 표시됩니다.
+URL이 비어 있거나 재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
 
 ---
 

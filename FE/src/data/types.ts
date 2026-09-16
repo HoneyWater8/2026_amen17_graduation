@@ -31,7 +31,7 @@ export type GradWhere = {
 
 export type GradVideo = {
   /**
-   * 영상 URL. 환경 변수(Vercel Blob 등)가 있으면 그 값, 없으면 public 경로.
+   * 영상 URL 또는 public 기준 경로. 각 콘텐츠에서 환경 변수나 경로를 지정한다.
    * 비어 있거나 재생에 실패하면 VideoSlot이 placeholder로 자동 폴백한다.
    */
   src: string;
@@ -42,6 +42,13 @@ export type GradVideo = {
   desc?: string;
   /** 영상이 아직 없을 때 placeholder에 표시할 안내 문구 */
   note: string;
+};
+
+export type TestimonyGroup = {
+  /** 초원명을 바꾸어도 재생 집계가 이어지도록 고정하는 식별자 */
+  id: string;
+  name: string;
+  video: GradVideo;
 };
 
 export type JourneyPhoto = {
@@ -83,7 +90,11 @@ export type GraduationData = {
   meta: GradMeta;
   when: GradWhen;
   where: GradWhere;
-  video: GradVideo;
+  testimony: {
+    title: string;
+    titleEn: string;
+    groups: TestimonyGroup[];
+  };
   journey: JourneyItem[];
   roster: string[];
   closing: GradClosing;

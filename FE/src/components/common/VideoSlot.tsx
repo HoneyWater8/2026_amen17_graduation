@@ -1,3 +1,7 @@
+/* ─────────────────────────────────────────────────────────
+   영상 슬롯 · 공통 재생 화면과 준비 안내
+   ───────────────────────────────────────────────────────── */
+
 import { useState } from 'react';
 import { EV, FF } from '../../theme/tokens';
 import type { GradVideo } from '../../data/types';
@@ -15,6 +19,10 @@ type VideoSlotProps = {
   pad?: number;
   /** 슬롯 식별용 data 속성 */
   slotKey?: string;
+  /** 같은 화면에 여러 영상이 있을 때 보조 기술로 구분할 이름 */
+  label?: string;
+  /** 2열 카드 안에서도 준비 안내가 잘리지 않도록 간격과 글자 크기를 줄인다 */
+  compact?: boolean;
 };
 
 /**
@@ -31,6 +39,8 @@ export function VideoSlot({
   iconSize = 44,
   pad = 6,
   slotKey,
+  label,
+  compact = false,
 }: VideoSlotProps) {
   const [failed, setFailed] = useState(false);
   const showVideo = Boolean(video.src) && !failed;
@@ -48,6 +58,7 @@ export function VideoSlot({
       >
         {showVideo ? (
           <video
+            aria-label={label}
             src={video.src}
             poster={video.poster}
             controls
@@ -58,17 +69,17 @@ export function VideoSlot({
             style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
           />
         ) : (
-          <div style={{ textAlign: 'center', padding: 18 }}>
-            <svg width={iconSize} height={iconSize} viewBox="0 0 46 46" style={{ margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', padding: compact ? 8 : 18 }}>
+            <svg width={iconSize} height={iconSize} viewBox="0 0 46 46" aria-hidden="true" style={{ display: 'block', margin: '0 auto' }}>
               <circle cx="23" cy="23" r="22" fill="none" stroke={EV.goldLt} strokeWidth="1" />
               <path d="M18 14 L33 23 L18 32 Z" fill={EV.goldLt} />
             </svg>
             <div style={{
-              marginTop: 12, fontFamily: FF.latin, fontSize: 10,
-              letterSpacing: 3, color: EV.goldLt,
+              marginTop: compact ? 4 : 12, fontFamily: FF.latin, fontSize: compact ? 7 : 10,
+              letterSpacing: compact ? 1.5 : 3, color: EV.goldLt,
             }}>VIDEO</div>
             <div style={{
-              marginTop: 5, fontFamily: FF.sans, fontSize: 11,
+              marginTop: compact ? 3 : 5, fontFamily: FF.sans, fontSize: compact ? 9 : 11,
               color: 'rgba(255,255,255,.55)',
             }}>{video.note}</div>
           </div>

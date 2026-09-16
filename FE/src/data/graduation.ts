@@ -1,17 +1,19 @@
 /* ─────────────────────────────────────────────────────────
    아멘 제자 17기 졸업 · 초대장 콘텐츠
    일시·장소 확정 — 2026-09-20 (주) 오후예배 14:30 · 다윗성전
-   ⚠️ 명단 · 사진 · 영상은 아직 placeholder — 확정 후 이 파일만 교체
+   명단 128명 · 여정 사진 59장 반영. 초원별 영상은 연결 전까지 준비 안내 표시.
    ───────────────────────────────────────────────────────── */
 
-import type { GraduationData, JourneyPhoto } from './types';
+import type { GraduationData, JourneyPhoto, TestimonyGroup } from './types';
 
-/* 영상 2종 — Vercel Blob 등 외부 URL이 있으면 우선, 없으면 저장소 자체 호스팅 경로.
-   둘 다 없으면 VideoSlot이 placeholder를 표시하므로 레이아웃은 무너지지 않는다. */
-
-/** 02 졸업 간증 영상 — 함께 졸업하지 못한 네 지체가 보내온 영상의 통합본 */
-const TESTIMONY_SRC = import.meta.env.VITE_TESTIMONY_VIDEO_URL || '/video/testimony.mp4';
-const TESTIMONY_POSTER = import.meta.env.VITE_TESTIMONY_VIDEO_POSTER || undefined;
+/** 초원과 영상의 연결이 정해지기 전에는 요청 없이 준비 안내를 표시한다. */
+function testimonyOf(number: number, name: string, src?: string, poster?: string): TestimonyGroup {
+  return {
+    id: `testimony-${number}`,
+    name,
+    video: { src: src || '', poster: poster || undefined, dur: '', note: '준비중 입니다' },
+  };
+}
 
 /** 03 여정 · 졸업식 — 제자들이 목사님께 한마디씩 전하는 영상 */
 const GRADUATION_SRC = import.meta.env.VITE_GRADUATION_VIDEO_URL || '/video/graduation.mp4';
@@ -70,13 +72,23 @@ export const G: GraduationData = {
     detail: "예배 후 다과 · 기념 촬영"
   },
 
-  // 졸업 간증 영상 — 함께 졸업하지 못한 네 지체의 영상을 하나로 엮은 통합본 1개
-  video: {
-    src: TESTIMONY_SRC,
-    poster: TESTIMONY_POSTER,
-    dur: "약 4분",
-    desc: "네 지체의 이야기를 하나로 엮은 영상입니다.",
-    note: "준비중 입니다"
+  // 졸업 간증 영상 — 초원별 10개. 배열 순서대로 왼쪽부터 2열로 표시한다.
+  // 이름·영상은 각 항목에서 교체하며, 로컬 영상 경로도 URL 자리에 직접 넣을 수 있다.
+  testimony: {
+    title: '졸업 간증 영상',
+    titleEn: 'Testimony',
+    groups: [
+      testimonyOf(1, '생사위주 초원', import.meta.env.VITE_TESTIMONY_1_VIDEO_URL, import.meta.env.VITE_TESTIMONY_1_VIDEO_POSTER),
+      testimonyOf(2, 'Onlyhim 초원', import.meta.env.VITE_TESTIMONY_2_VIDEO_URL, import.meta.env.VITE_TESTIMONY_2_VIDEO_POSTER),
+      testimonyOf(3, '하.군.남 초원', import.meta.env.VITE_TESTIMONY_3_VIDEO_URL, import.meta.env.VITE_TESTIMONY_3_VIDEO_POSTER),
+      testimonyOf(4, '다모인 초원', import.meta.env.VITE_TESTIMONY_4_VIDEO_URL, import.meta.env.VITE_TESTIMONY_4_VIDEO_POSTER),
+      testimonyOf(5, '은혜둥이 팔복둥이 초원', import.meta.env.VITE_TESTIMONY_5_VIDEO_URL, import.meta.env.VITE_TESTIMONY_5_VIDEO_POSTER),
+      testimonyOf(6, '영음 초원', import.meta.env.VITE_TESTIMONY_6_VIDEO_URL, import.meta.env.VITE_TESTIMONY_6_VIDEO_POSTER),
+      testimonyOf(7, '감사의 언니들 초원', import.meta.env.VITE_TESTIMONY_7_VIDEO_URL, import.meta.env.VITE_TESTIMONY_7_VIDEO_POSTER),
+      testimonyOf(8, '더드림 가조 초원', import.meta.env.VITE_TESTIMONY_8_VIDEO_URL, import.meta.env.VITE_TESTIMONY_8_VIDEO_POSTER),
+      testimonyOf(9, '어순종팀 초원', import.meta.env.VITE_TESTIMONY_9_VIDEO_URL, import.meta.env.VITE_TESTIMONY_9_VIDEO_POSTER),
+      testimonyOf(10, '부어부어 초원', import.meta.env.VITE_TESTIMONY_10_VIDEO_URL, import.meta.env.VITE_TESTIMONY_10_VIDEO_POSTER),
+    ],
   },
 
   // 함께 걸어온 길 — 시기별 6개 항목, 각 항목마다 가로 캐러셀 사진 5장

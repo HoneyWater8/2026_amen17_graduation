@@ -48,7 +48,7 @@ export function Journey({ active }: JourneyProps) {
               )}
 
               {/* 아직 치르지 않은 일정(졸업식)은 사진 대신 영상 자리를 둔다.
-                  타임라인 항목 안이라 본편(Testimony)보다 작게 잡는다. */}
+                  타임라인 축과 오른쪽 여백 안에 영상 폭을 맞춘다. */}
               {t.video ? (
                 <div style={{ marginTop: 9, marginRight: 22 }}>
                   <VideoSlot

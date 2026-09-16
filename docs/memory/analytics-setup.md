@@ -10,7 +10,7 @@ metadata:
 | | Vercel Web Analytics | Google Analytics 4 |
 |---|---|---|
 | 맡는 것 | 방문자 · 페이지뷰 · 유입 경로 · 기기 | 봉투 열기 · 섹션 도달 · 영상 재생 · 공유 · 사진 확대 |
-| 상태 | 2026-09-11 활성화 완료 | 측정 ID `G-P7PXPF9CWM`, Vercel 환경 변수 `VITE_GA_ID` 등록 완료 |
+| 상태 | 2026-09-11 활성화 완료 | 측정 ID `G-P7PXPF9CWM`, `FE/index.html`의 구글 표준 스니펫으로 초기화 |
 | 쿠키 | 없음 | 사용 |
 | 보존 | **1개월** (Hobby) | 14개월 |
 
@@ -29,5 +29,5 @@ metadata:
 ## How to apply
 
 - 이벤트를 추가할 때는 `FE/src/utils/analytics.ts`의 `track(name, params, once)`를 씁니다. `once=true`면 같은 키로 한 번만 보냅니다(스크롤 왕복 대비).
-- **`VITE_GA_ID`가 없으면 GA 코드가 번들에서 통째로 사라집니다** — Vite가 죽은 코드로 판단해 제거합니다. 의도된 동작이며, ID를 넣고 빌드하면 살아납니다.
-- 측정 ID는 스크립트에 노출되는 공개 값이라 Vercel에 `--type config`로 등록했습니다 ([[kakao-app-setup]]의 JS키와 같은 성격).
+- **`VITE_GA_ID`는 현재 코드에서 사용하지 않습니다.** 환경 변수 유무와 관계없이 `FE/index.html`의 스니펫이 초기화합니다. ID를 바꾸려면 스크립트 URL과 `gtag('config', ...)`를 함께 변경합니다.
+- 초기 도입 시 환경 변수에 ID를 등록했지만, 모듈로 동적 로드하던 방식의 전송 문제 때문에 2026-09-11 표준 HTML 스니펫으로 교체했습니다. 이전 환경 변수 설명을 근거로 초기화 방식을 되돌리지 않습니다.
