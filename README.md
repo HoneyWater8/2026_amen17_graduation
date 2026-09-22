@@ -14,7 +14,7 @@
 
 ## 현재 상태
 
-**디자인·명단·여정 사진 반영 완료. 수령한 간증 영상 4편과 감사 합본 로컬 연결 완료.**
+**디자인·명단·여정 사진 반영 완료. 수령한 간증 영상 4편과 감사 합본을 Vercel Blob으로 공개 배포했습니다.**
 
 졸업 예배는 2026-09-20에 진행되었으며 명단 128명, 여정 사진 61장이 반영되어 있습니다. 초원명과 영상 등 콘텐츠는 [`FE/src/data/graduation.ts`](./FE/src/data/graduation.ts)에서 변경합니다.
 
@@ -27,8 +27,8 @@
 | 졸업생 명단 | ✅ **128명** 실명 반영 (2026-09-11) |
 | 여정 사진 | ✅ 61장 배치 (입학식 23 · 하나로가족한마당 19 · 식사 모임 18 · 졸업 예배 1) |
 | 공유 썸네일 · 탭 아이콘 | ✅ 1200×630 썸네일, 왁스 씰 favicon |
-| 졸업 예배 영상 | ✅ 감사 영상 7개 통합본의 경량·고화질 파일 준비, 사진 아래 경량본 연결<br>⏳ 배포용 공개 URL 업로드 대기 |
-| 졸업 간증 영상 | ✅ 초원별 10개 카드와 실제 초원명, 수령한 02·08·09·10의 경량본 연결<br>⏳ 나머지 6개 초원 영상 수령 및 배포용 공개 URL 업로드 대기 |
+| 졸업 예배 영상 | ✅ 감사 영상 7개 통합본의 경량·고화질 파일 준비, 사진 아래 경량본 연결 및 Vercel Blob 공개 배포 |
+| 졸업 간증 영상 | ✅ 초원별 10개 카드와 실제 초원명, 수령한 02·08·09·10의 경량본 Vercel Blob 공개 배포<br>⏳ 나머지 6개 초원 영상 수령 |
 | 열람 기한 처리 | ❌ **구현 안 함** — 배포를 직접 내릴 때까지 상시 공개 (2026-09-07 결정) |
 | 어워드(시상) 섹션 | ⏳ 후속 과제 |
 
@@ -163,33 +163,29 @@ npm run lint
 | Build Command | `npm run build` (자동) |
 | Output Directory | `dist` (자동) |
 
-### 최초 1회 — 프로젝트 연결
+### 새 작업 환경 — 기존 프로젝트 연결
+
+프로젝트와 Git 자동 배포는 이미 연결되어 있습니다. Blob 업로드·환경 변수 관리를 위해 로컬 CLI 연결이 필요한 경우에만 실행합니다.
 
 ```sh
 cd FE
 npx vercel login          # 브라우저 인증 (직접 실행 필요)
-npx vercel                # 프로젝트 생성 + 연결. Root Directory를 FE로 잡아줌
+npx vercel link --project 2026_amen17_graduation --scope su-heon-choi-s-projects
 ```
 
 `FE/.vercel/project.json`이 생성되며 이 폴더는 **커밋하지 않습니다** (`.gitignore` 처리됨).
 
 ### 이후 배포 — Git 자동 배포
 
-`HoneyWater8/2026_amen17_graduation` 레포가 연결되어 있어 **`main`에 push하면 자동으로 프로덕션 배포**됩니다.
+`HoneyWater8/2026_amen17_graduation` 레포가 연결되어 있어 **검증한 변경 사항을 `main`에 커밋·푸시하면 자동으로 프로덕션 배포**됩니다. 2026-09-22 사용자 확인에 따라 앱 배포는 이 방식으로 진행합니다.
 
 ```sh
 git push origin main      # → Vercel이 자동 빌드·배포
 ```
 
-CLI로 직접 배포할 수도 있습니다.
+푸시 후 Vercel의 자동 빌드·배포 결과와 실제 사이트를 확인합니다. `vercel deploy`, `vercel --prod`, `vercel redeploy` 같은 직접 배포 명령은 사용하지 않습니다. Blob 업로드와 환경 변수 등록에 사용하는 CLI 명령은 별개입니다.
 
-```sh
-cd FE
-npx vercel                # 프리뷰 배포
-npx vercel --prod         # 프로덕션 배포
-```
-
-> ⚠️ **Root Directory는 반드시 `FE`여야 합니다.** CLI 배포는 `FE/`를 통째로 올려서 `.`이어도 동작하지만, Git 빌드는 레포 루트에서 `package.json`을 찾기 때문에 `.`이면 실패합니다.
+> **Root Directory는 반드시 `FE`여야 합니다.** Git 빌드는 레포 루트를 기준으로 하며 앱의 `package.json`은 `FE/`에 있습니다.
 
 ### 환경 변수
 
@@ -299,6 +295,8 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 
 **졸업 간증 영상** — `G.testimony.groups`에 10개 초원이 등록되어 있습니다. `testimonyOf()`의 두 번째 인자는 표시명이며, 배열 순서대로 왼쪽부터 배치합니다. 첫 번째 인자는 재생 집계용 고정 번호이므로 초원명을 바꾸어도 유지합니다.
 
+**영상은 한 번에 하나만 재생합니다.** 간증·감사 영상을 구분하지 않고 새 영상을 재생하면 다른 영상은 자동으로 일시정지합니다. 멈춘 위치는 유지되어 다시 누르면 이어서 재생합니다.
+
 영상 원본은 `assets/video-originals/`에 보존하고, `scripts/prepare-videos.py`로 재생용 `preview.mp4`와 `full.mp4`를 만듭니다. 초원별 수령 현황·파일 경로·감사 통합본 순서·재생성 방법은 [영상 자산 관리](./docs/video-assets.md)를 참고하세요. 작은 화면/전체화면에 따른 화질 전환 기능은 아직 구현하지 않았습니다.
 
 수령한 초원 02·08·09·10은 `/video/testimony/NN/preview.mp4`를 기본 재생 경로로 사용합니다. 초원별 공개 URL을 지정하면 그 주소를 우선합니다 (예: 초원 1은 `VITE_TESTIMONY_1_VIDEO_URL`, 자세한 설정은 `FE/.env.example`).
@@ -306,11 +304,11 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 | 방식 | 방법 | 적합한 경우 |
 |---|---|---|
 | 로컬 파일 | `FE/public/video/` 아래에 두고 해당 초원의 URL을 `/video/파일명.mp4`로 지정 | 로컬 확인 (`public/video/*`는 git 제외) |
-| **외부 호스팅 (Vercel Blob 등)** | 영상 업로드 후 해당 초원의 URL에 공개 주소 지정 | 배포용 영상 |
+| **Vercel Blob (현재 배포 방식)** | 영상 업로드 후 Production/Preview 환경 변수에 공개 주소 지정 | 배포용 영상 |
 
-공개 URL과 로컬 연결이 모두 없거나 재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. 영상은 Git에서 제외하므로 배포 시에는 별도 업로드와 공개 URL 설정이 필요합니다. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
+공개 URL과 로컬 연결이 모두 없거나 재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. **2026-09-22 수령한 간증 4편과 감사 합본의 경량본을 Vercel Blob에 업로드하고 Production/Preview URL을 등록했습니다.** 기존 환경 변수를 유지하면 이후 Git 배포에서도 영상이 연결됩니다. 영상 교체 시에는 새 파일 업로드 → 환경 변수 URL 변경 → `main` 커밋·푸시를 통한 자동 배포 순서로 반영합니다. 공개 경로와 절차는 [영상 자산 관리](./docs/video-assets.md#공개-배포-vercel-blob)를 참고하세요. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
 
-**졸업 예배 감사 영상** — 사진 캐러셀 아래에 `/video/graduation/preview.mp4`를 재생합니다. `VITE_GRADUATION_VIDEO_URL`을 지정하면 그 공개 주소를 우선 사용합니다. 영상은 Git에서 제외하므로 원격 배포에는 별도 업로드와 URL 설정이 필요합니다.
+**졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 Vercel Blob 경량본을 재생합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/preview.mp4`를 사용합니다. 고화질본 업로드와 전체화면 화질 전환은 후속 작업입니다.
 
 ---
 
@@ -389,10 +387,10 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [x] ~~졸업 일시·장소 반영~~ — 2026-09-20 (주) 오후예배 14:30 · 다윗성전
 - [x] ~~Vercel 프로젝트 연결 · 프로덕션 배포~~ — 2026-09-07
 - [x] ~~졸업생 실명 명단 반영~~ — 128명, 2026-09-11
-- [ ] 졸업 예배 감사 통합본 (§03) 공개 URL 업로드 — 7편 합본의 로컬 경량본 연결 완료
+- [x] 졸업 예배 감사 통합본 (§03) 공개 URL 업로드 — 2026-09-22 Vercel Blob 경량본 배포
 - [ ] 추가 졸업 예배 사진 수령 후 `02.jpg`부터 배치
 - [ ] 나머지 6개 초원 간증 영상 수령 — 01·03·04·05·06·07
-- [ ] 졸업 간증 영상 공개 URL 업로드 — 수령한 02·08·09·10의 로컬 경량본 연결 완료
+- [x] 졸업 간증 영상 공개 URL 업로드 — 2026-09-22 수령한 02·08·09·10의 Vercel Blob 경량본 배포
 - [ ] 작은 화면에서는 경량본, 전체화면에서는 고화질본으로 재생 위치를 유지하며 전환
 - [x] ~~카카오 공유용 `thumbnail.png` 제작~~ — 1200×630, 2026-09-11
 - [x] ~~`VITE_KAKAO_JS_KEY` 발급 + 도메인 등록~~ — 2026-09-11 완료

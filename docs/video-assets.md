@@ -32,7 +32,47 @@ FE/public/video/                    # 재생용 파일만 배치. Git 제외
 └─ graduation/{preview,full}.mp4     # 감사 영상 7개를 합친 영상
 ```
 
-`public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않으며, 배포용 공개 URL 업로드는 별도 작업이다.
+`public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않는다. 배포용 경량본 5개는 Vercel Blob에 올렸으며, Git 빌드는 환경 변수의 공개 URL로 연결한다.
+
+## 공개 배포 (Vercel Blob)
+
+**2026-09-22 사용자의 공개 업로드 승인 후 간증 4편과 감사 합본 1편을 배포했다.** 페이지와 영상 모두 Vercel에서 제공한다. 기존 Git 배포에서 영상 경로가 404였던 원인은 `FE/public/video/`의 파일이 Git 제외 대상이라 원격 빌드에 없었기 때문이다.
+
+| 항목 | 값 |
+|---|---|
+| 연결 프로젝트 | `su-heon-choi-s-projects/2026_amen17_graduation` |
+| Blob 저장소 | `amen17-graduation-videos` / `store_zw4d65fKlIme6aVE` |
+| 접근 · 리전 | Public · `icn1` (서울) |
+| 공개 주소 기준 | `https://zw4d65fklime6ave.public.blob.vercel-storage.com/` |
+| 배포 파일 | 경량본 5개, 총 104,466,463 B (99.63 MiB) |
+| 적용 환경 | Production · Preview. Development는 로컬 파일 기본 경로 유지 |
+
+다음 경로를 위 공개 주소 기준에 이어 붙인 전체 URL이 각 환경 변수의 값이다. 파일명의 12자리 값은 로컬 파일 SHA-256의 앞부분이며, 교체 시 새 경로를 사용해 기존 캐시와 구분한다.
+
+| 환경 변수 | Blob 경로 |
+|---|---|
+| `VITE_TESTIMONY_2_VIDEO_URL` | `video/testimony/02/preview-3df9baf99f02.mp4` |
+| `VITE_TESTIMONY_8_VIDEO_URL` | `video/testimony/08/preview-f47fcfaf6b53.mp4` |
+| `VITE_TESTIMONY_9_VIDEO_URL` | `video/testimony/09/preview-1e5bec65b25d.mp4` |
+| `VITE_TESTIMONY_10_VIDEO_URL` | `video/testimony/10/preview-5d3111dbf9b0.mp4` |
+| `VITE_GRADUATION_VIDEO_URL` | `video/graduation/preview-2b5c48754661.mp4` |
+
+이미 등록한 환경 변수를 유지하면 이후 Git 푸시에도 영상이 연결된다. **원본과 `full.mp4`는 업로드하지 않았다.** 현재 플레이어가 사용하는 경량본만 공개했으며, 고화질본 공개 배포는 전체화면 화질 전환 구현과 함께 진행한다.
+
+간증·감사 영상을 통틀어 한 번에 하나만 재생한다. 새 영상의 재생이 시작되면 공통 `VideoSlot`이 다른 영상들을 일시정지하며, 재생 위치는 초기화하지 않는다.
+
+### 영상 추가·교체
+
+1. 아래 변환 절차로 로컬 재생본을 만들고 재생·길이·순서를 확인한다.
+2. `FE/`에서 로그인된 Vercel CLI로 기존 Blob 저장소에 업로드한다. 예: `npx vercel blob put public/video/testimony/02/preview.mp4 --access public --pathname video/testimony/02/preview-<새 SHA256 앞 12자리>.mp4 --content-type video/mp4 --scope su-heon-choi-s-projects`.
+3. 반환된 공개 URL에 `200`, `video/mp4`, 정확한 파일 크기, `Range` 요청의 `206` 응답을 확인한다.
+4. 해당 `VITE_*_VIDEO_URL`을 Production/Preview에 등록하거나 갱신한다. 예: `npx vercel env add VITE_TESTIMONY_2_VIDEO_URL production,preview --value <공개 URL> --force --yes --no-sensitive --scope su-heon-choi-s-projects`. 미수령 초원은 기존 환경 변수 연결을 사용하므로 영상 URL만 등록하면 된다.
+5. 코드·영상 관리 문서 등 변경 사항을 `main`에 커밋·푸시해 Vercel 자동 배포로 반영한다. 직접 배포 명령은 사용하지 않는다. Vite는 빌드 시 URL을 넣으므로 **환경 변수 변경만으로 기존 배포가 바뀌지는 않는다.**
+6. 실제 프로덕션 페이지에서 재생과 구간 이동을 확인한다. 새 배포가 검증될 때까지 기존 Blob을 삭제하지 않는다.
+
+CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 59.25.0의 저장소 연결은 `VERCEL_OIDC_TOKEN`과 `BLOB_READ_WRITE_TOKEN`을 내려주지만 `BLOB_STORE_ID`는 빠져 있었다. 두 OIDC 값이 모두 필요하다는 오류가 나면 `.env.local`에 `BLOB_STORE_ID="store_zw4d65fKlIme6aVE"`를 함께 지정한다. 인증 토큰은 문서·Git·프론트엔드 번들에 넣지 않으며 `VITE_` 접두사도 붙이지 않는다. `vercel env pull` 등이 `.gitignore` 끝에 `.env*`를 추가하면 기존 `!.env.example` 예외가 유지되도록 중복 줄을 제거한다.
+
+현재 Hobby 플랜을 유지한다. 무료 포함량은 저장 공간 1GB, 월 Blob 전송량 10GB이며, 한도를 넘으면 접근이 제한될 수 있으므로 Vercel 대시보드에서 사용량을 확인한다. [Vercel Blob 사용량·요금](https://vercel.com/docs/vercel-blob/usage-and-pricing)
 
 ## 초원별 수령 현황
 
@@ -62,7 +102,7 @@ FE/public/video/                    # 재생용 파일만 배치. Git 제외
 
 감사 영상 원본은 720p·1080p·정사각형·2336×1080 영상이 섞여 있다. 가장 넓은 원본을 줄이지 않고 16:9 화면 안에 담기 위해 통합 고화질본을 2560×1440으로 만들었다. 작은 원본을 확대해도 원본에 없던 디테일이 생기는 것은 아니다. 비율이 다른 영상은 자르거나 늘이지 않고 여백을 둔다. 회전 정보는 실제 화면 방향에 반영하며, HDR 영상은 SDR BT.709로 변환한다.
 
-졸업 예배 항목은 사진 캐러셀 아래에 `/video/graduation/preview.mp4`를 연결했다. 간증 초원 02·08·09·10도 `/video/testimony/NN/preview.mp4`를 연결했다. 각 영상의 공개 URL 환경 변수가 있으면 해당 URL을 우선하며, 미수령 간증 초원에는 준비 안내를 유지한다. 배포용 공개 URL 업로드와 전체화면에서 고화질본으로 소스를 전환하는 기능은 후속 작업이다.
+졸업 예배와 간증 초원 02·08·09·10은 배포 환경에서 Vercel Blob의 경량본 URL을 사용한다. 환경 변수가 없는 로컬에서는 각각 `/video/graduation/preview.mp4`, `/video/testimony/NN/preview.mp4`를 사용한다. 미수령 간증 초원에는 준비 안내를 유지한다. 고화질본 공개 업로드와 전체화면에서 고화질본으로 소스를 전환하는 기능은 후속 작업이다.
 
 ### 생성 결과
 

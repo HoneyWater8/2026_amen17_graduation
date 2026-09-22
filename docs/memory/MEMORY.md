@@ -8,10 +8,10 @@
 - [참고 레포 · 2026 하나로 가족 한마당](./reference-repo-hanaro-festival.md) — 구조·컨벤션의 출처. 로컬 경로 포함
 - [이전 프로젝트 컨벤션 답습 선호](./prefers-mirroring-prior-project.md) — 새 구조를 발명하지 말 것
 - [관습적·담백한 UI 선호](./prefers-plain-conventional-ui.md) — 장식을 더하지 말고 먼저 제안할 것
-- [자산 파이프라인](./asset-pipeline.md) — 졸업 예배 사진 추가 예정 · 감사 원본은 NN-그룹.mp4, 앞 번호순 합본. 간증 02·08·09·10과 감사 합본 로컬 연결 완료 · 영상 원본 11개·재생본 10개 보관 · 공개 URL·화질 전환 대기
+- [자산 파이프라인](./asset-pipeline.md) — 졸업 예배 사진 추가 예정 · 감사 원본은 NN-그룹.mp4, 앞 번호순 합본. 간증 02·08·09·10과 감사 합본 경량본 Vercel Blob 공개 배포 완료 · 영상 원본 11개·재생본 10개 로컬 보관 · 고화질 배포·화질 전환 대기
 - [사용자 집계 설정](./analytics-setup.md) — Vercel+GA4 두 축. GA4는 HTML 스니펫으로 초기화. **2026-10 중순 전에 Vercel 대시보드 캡처 필요**
 - [카카오 앱 설정](./kakao-app-setup.md) — 도메인은 「제품 링크 관리」에 등록. 플랫폼>Web 아님
-- [Vercel 배포 설정과 함정](./vercel-deploy-setup.md) — 계정·프로젝트 정보 + FE/ 하위 구조 때문에 생기는 함정 4가지
+- [Vercel 배포 설정](./vercel-deploy-setup.md) — main 커밋·푸시로 자동 배포 · 직접 배포 명령 사용 안 함 · 프로젝트·Blob 설정
 - [커밋·푸시는 지시받을 때만](./ask-before-commit-push.md) — push가 곧 공개 배포라 알아서 커밋하지 말 것
 - [개인 GitHub identity](./github-identity.md) — HoneyWater8 / 전역 git config는 회사 이메일이라 주의
 

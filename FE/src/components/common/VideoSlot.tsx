@@ -65,7 +65,14 @@ export function VideoSlot({
             playsInline
             preload="metadata"
             onError={() => setFailed(true)}
-            onPlay={() => track('video_play', { video: slotKey ?? 'unknown' }, true)}
+            onPlay={({ currentTarget }) => {
+              // 간증과 감사 영상의 소리가 겹치지 않도록, 다른 영상은 재생 위치를 유지한 채 멈춘다.
+              currentTarget.ownerDocument.querySelectorAll<HTMLVideoElement>('[data-role="video-slot"] video')
+                .forEach((other) => {
+                  if (other !== currentTarget) other.pause();
+                });
+              track('video_play', { video: slotKey ?? 'unknown' }, true);
+            }}
             style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
           />
         ) : (
