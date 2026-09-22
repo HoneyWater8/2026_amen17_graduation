@@ -40,13 +40,13 @@ export const FF = {
   sans:  '"Nanum Myeongjo", serif',
 };
 
-/** 모션 값 — 봉투 연출 타이밍은 핸드오프 확정값 */
+/** 모션 값 — 클릭 후 첫 섹션까지 기다림이 길어지지 않도록 개봉 타이밍을 함께 조정한다. */
 export const MOTION = {
-  flap:        'transform .85s cubic-bezier(.5,.05,.3,1)',
-  card:        'transform 1.05s cubic-bezier(.22,1,.36,1) .35s',
-  overlayFade: 'opacity .5s ease .55s',
+  flap:        'transform .55s cubic-bezier(.5,.05,.3,1), z-index 0s linear .275s',
+  card:        'transform .7s cubic-bezier(.22,1,.36,1) .1s',
+  overlayFade: 'opacity .3s ease',
   /** stage: opening → out 전환까지의 시간 (ms) */
-  openDuration: 1500,
+  openDuration: 700,
 
   /**
    * 진입 연출 — 라벨 → 봉투 → 안내 문구 순으로 약 1.55초에 걸쳐 도착.

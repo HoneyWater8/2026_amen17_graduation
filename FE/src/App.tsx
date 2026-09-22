@@ -20,7 +20,7 @@ export default function App() {
   const [stage, setStage] = useState<EnvelopeStage>('closed');
   const openTimerRef = useRef<number | null>(null);
 
-  // 본문 등장 애니메이션은 봉투가 완전히 걷힌 뒤에야 시작한다.
+  // 봉투가 걷히기 시작할 때 본문을 드러내, 클릭 전에는 등장 애니메이션이 소진되지 않게 한다.
   const active = stage === 'out';
 
   const open = useCallback(() => {

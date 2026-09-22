@@ -36,7 +36,7 @@ export function Envelope({ stage, onOpen }: EnvelopeProps) {
         cursor: opening ? 'default' : 'pointer',
         opacity: stage === 'out' ? 0 : 1,
         pointerEvents: stage === 'out' ? 'none' : 'auto',
-        transition: 'opacity .5s ease .55s',
+        transition: MOTION.overlayFade,
       }}
     >
       <div style={{ width: '100%', maxWidth: 320, textAlign: 'center', marginTop: '18%' }}>
@@ -64,7 +64,7 @@ export function Envelope({ stage, onOpen }: EnvelopeProps) {
             alignItems: 'center', justifyContent: 'center', gap: 5,
             padding: '20px 18px', overflow: 'hidden',
             transform: opening ? 'translateY(-72%)' : 'translateY(0)',
-            transition: 'transform 1.05s cubic-bezier(.22,1,.36,1) .35s',
+            transition: MOTION.card,
             zIndex: 1,
           }}>
             <div style={{ position: 'absolute', inset: 7, border: `1.5px solid ${EV.gold}`, opacity: 0.75, pointerEvents: 'none' }} />
@@ -98,12 +98,12 @@ export function Envelope({ stage, onOpen }: EnvelopeProps) {
             </svg>
           </div>
 
-          {/* 상단 플랩 — z-index는 회전 중간(.42s)에 바뀌어 카드 뒤로 넘어간다 */}
+          {/* 상단 플랩 — z-index는 회전 중간에 바뀌어 카드 뒤로 넘어간다 */}
           <div style={{
             position: 'absolute', left: 0, right: 0, top: 0, height: '56%',
             transformOrigin: 'top center', zIndex: opening ? 0 : 3,
             transform: opening ? 'rotateX(-172deg)' : 'rotateX(0deg)',
-            transition: 'transform .85s cubic-bezier(.5,.05,.3,1), z-index 0s linear .42s',
+            transition: MOTION.flap,
             transformStyle: 'preserve-3d',
           }}>
             <svg viewBox="0 0 300 168" preserveAspectRatio="none"
