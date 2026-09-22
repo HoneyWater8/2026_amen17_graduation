@@ -38,7 +38,7 @@ export type GradVideo = {
   /** 첫 프레임 포스터 이미지 — 없으면 검은 배경 */
   poster?: string;
   dur: string;
-  /** 영상 자체의 설명. 타임라인 항목은 JourneyItem.desc를 쓰므로 여기서는 비워둔다 */
+  /** 영상 위에 표시할 설명. 사진 등 항목 전체의 설명과 구분한다 */
   desc?: string;
   /** 영상이 아직 없을 때 placeholder에 표시할 안내 문구 */
   note: string;
@@ -66,16 +66,13 @@ export type JourneyItem = {
   /** 시기 라벨 (예: "2025 · 봄") — 한글이 섞이므로 serif로 조판 */
   period: string;
   title: string;
-  /** 한 줄 설명. 현재는 쓰지 않지만 필요해지면 항목에 다시 넣으면 된다 */
+  /** 타임라인 항목 전체에 대한 한 줄 설명 */
   desc?: string;
   /** 현재 시점이면 타임라인 다이아몬드를 채움 */
   now?: boolean;
-  /** 사진 가로 캐러셀. video가 있는 항목에는 없다 */
+  /** 사진 가로 캐러셀. video와 함께 있으면 사진 다음에 영상을 표시한다 */
   photos?: JourneyPhoto[];
-  /**
-   * 사진 대신 영상이 들어가는 항목 (졸업식).
-   * photos와 함께 주면 영상이 우선한다.
-   */
+  /** 사진과 함께 표시할 수 있는 영상 (졸업 예배의 감사 영상) */
   video?: GradVideo;
 };
 

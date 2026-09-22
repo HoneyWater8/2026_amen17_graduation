@@ -10,7 +10,7 @@
     python scripts/prepare-videos.py --section graduation
     python scripts/prepare-videos.py --section all
 
-감사 합본은 GRATITUDE 순서대로 자르지 않고 연결한다. 순서를 바꾸면 합본이 재생성된다.
+감사 합본은 NN-그룹.mp4 파일명의 앞 번호순으로 자르지 않고 연결한다.
 원본 해시·변환 인자가 같은 완료 파일은 재사용한다. 검증 전 결과는 public에 노출하지 않는다.
 """
 
@@ -37,10 +37,11 @@ TESTIMONY = [
     (7, '감사의 언니들 초원'), (8, '더드림 가조 초원'),
     (9, '어순종팀 초원'), (10, '부어부어 초원'),
 ]
-GRATITUDE = [
-    '장년-01.mp4', '장년-03.mp4', '장년-04.mp4', '장년-05.mp4',
-    '청년-02.mp4', '청년-06.mp4',
-]
+# 장년·청년 구분보다 파일명 앞 번호를 우선한다. 목록 추가 위치와 무관하게 숫자로 정렬한다.
+GRATITUDE = sorted([
+    '01-장년.mp4', '02-청년.mp4', '03-장년.mp4', '04-장년.mp4',
+    '05-장년.mp4', '06-청년.mp4', '07-장년.mp4',
+], key=lambda name: int(Path(name).stem.split('-', 1)[0]))
 
 
 def probe(path):

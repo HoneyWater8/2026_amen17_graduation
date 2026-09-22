@@ -8,7 +8,7 @@ import { G } from '../../data/graduation';
 
 type JourneyProps = { active: boolean };
 
-/** 03 함께 걸어온 길 — 시기별 사진 캐러셀과 졸업식 영상을 타임라인으로 표시한다. */
+/** 03 함께 걸어온 길 — 시기별 사진과 감사 영상을 함께 표시한다. */
 export function Journey({ active }: JourneyProps) {
   return (
     <Section label="03 Our Journey" bg={EV.paper}>
@@ -47,19 +47,25 @@ export function Journey({ active }: JourneyProps) {
                 }}>{t.desc}</div>
               )}
 
-              {/* 아직 치르지 않은 일정(졸업식)은 사진 대신 영상 자리를 둔다.
-                  타임라인 축과 오른쪽 여백 안에 영상 폭을 맞춘다. */}
-              {t.video ? (
-                <div style={{ marginTop: 9, marginRight: 22 }}>
+              {t.photos && t.photos.length > 0 && <PhotoRail photos={t.photos} />}
+
+              {/* 졸업 예배 후 사진과 감사 영상을 함께 볼 수 있도록 각각 표시한다. */}
+              {t.video && (
+                <div style={{ marginTop: t.photos?.length ? 16 : 9, marginRight: 22 }}>
+                  {t.video.desc && (
+                    <div style={{
+                      marginBottom: 9, fontFamily: FF.sans, fontSize: 11,
+                      color: EV.inkSoft, lineHeight: 1.5,
+                    }}>{t.video.desc}</div>
+                  )}
                   <VideoSlot
                     video={t.video}
                     iconSize={34}
                     pad={5}
                     slotKey="graduation"
+                    label={t.video.desc ?? t.title}
                   />
                 </div>
-              ) : (
-                t.photos && <PhotoRail photos={t.photos} />
               )}
             </div>
           </Reveal>

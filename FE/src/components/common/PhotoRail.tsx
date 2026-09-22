@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { EV, FF } from '../../theme/tokens';
+import { EV, FF, LAYOUT } from '../../theme/tokens';
 import { useShuffled } from '../../hooks/useShuffled';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { Lightbox } from './Lightbox';
@@ -34,12 +34,14 @@ type PhotoRailProps = {
 /**
  * 시기별 사진 가로 캐러셀.
  *
- * 마운트 시 순서를 한 번 셔플하고, 배열을 두 벌 이어 붙여 rAF로 흘려보낸다.
+ * 마운트 시 순서를 한 번 셔플하고, 화면을 채울 만큼 이어 붙여 rAF로 흘려보낸다.
+ * 사진이 한 장이면 복제와 자동 이동 없이 표시한다.
  * 손으로 끌면 멈추고, 놓으면 관성이 붙었다가 다시 자동 흐름으로 돌아온다.
  * 카드를 탭하면 라이트박스로 원본을 크게 본다.
  */
 export function PhotoRail({ photos }: PhotoRailProps) {
   const shuffled = useShuffled(photos);
+  const many = shuffled.length > 1;
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const lastTimeRef = useRef(0);
@@ -56,7 +58,7 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   const reduced = usePrefersReducedMotion();
 
   // 라이트박스가 열려 있거나 모션 감소 모드면 자동 흐름을 멈춘다.
-  const paused = openIndex !== null || reduced;
+  const paused = !many || openIndex !== null || reduced;
 
   const wrap = (x: number) => {
     const c = cycleRef.current;
@@ -67,14 +69,15 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   useEffect(() => {
     // 한 사이클 = 카드 수 × stride. scrollWidth/2로 재면 좌우 padding이 끼어들어
     // 매 바퀴 어긋나며 끊긴다 (참고 레포에서 실제로 겪은 버그).
-    cycleRef.current = shuffled.length * CARD_STRIDE;
-    offsetRef.current = wrap(offsetRef.current);
+    cycleRef.current = shuffled.length > 1 ? shuffled.length * CARD_STRIDE : 0;
+    offsetRef.current = cycleRef.current ? wrap(offsetRef.current) : 0;
     if (trackRef.current) {
       trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
     }
   }, [shuffled.length]);
 
   useEffect(() => {
+    if (shuffled.length < 2) return;
     let raf = 0;
     const tick = (t: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = t;
@@ -97,7 +100,7 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   }, [paused, shuffled.length]);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0) return;
+    if (!many || e.button !== 0) return;
     dragRef.current = {
       startX: e.clientX, startOffset: offsetRef.current,
       lastX: e.clientX, lastT: performance.now(),
@@ -152,7 +155,9 @@ export function PhotoRail({ photos }: PhotoRailProps) {
     }
   };
 
-  const doubled = [...shuffled, ...shuffled];
+  // 두세 장만 있을 때도 한 사이클 뒤에 앱 최대 폭만큼의 사진을 이어 빈틈을 막는다.
+  const copies = many ? Math.ceil(LAYOUT.maxWidth / (shuffled.length * CARD_STRIDE)) + 1 : 1;
+  const cards = Array.from({ length: copies }, () => shuffled).flat();
 
   return (
     <>
@@ -167,11 +172,11 @@ export function PhotoRail({ photos }: PhotoRailProps) {
           marginRight: -22,
           overflow: 'hidden',
           // 양 끝을 흐려 잘린 카드가 아니라 이어지는 흐름으로 보이게 한다.
-          maskImage: 'linear-gradient(to right, transparent, black 4%, black 96%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 4%, black 96%, transparent)',
+          maskImage: many ? 'linear-gradient(to right, transparent, black 4%, black 96%, transparent)' : undefined,
+          WebkitMaskImage: many ? 'linear-gradient(to right, transparent, black 4%, black 96%, transparent)' : undefined,
           // 세로 스크롤은 페이지에 양보하고 가로만 이 트랙이 가져간다.
           touchAction: 'pan-y',
-          cursor: dragging ? 'grabbing' : 'grab',
+          cursor: many ? (dragging ? 'grabbing' : 'grab') : 'default',
           userSelect: 'none', WebkitUserSelect: 'none',
         }}
       >
@@ -179,10 +184,10 @@ export function PhotoRail({ photos }: PhotoRailProps) {
           ref={trackRef}
           style={{
             display: 'flex', gap: CARD_GAP,
-            width: 'max-content', willChange: 'transform',
+            width: 'max-content', willChange: many ? 'transform' : undefined,
           }}
         >
-          {doubled.map((p, i) => {
+          {cards.map((p, i) => {
             const realIndex = i % shuffled.length;
             return (
               <div

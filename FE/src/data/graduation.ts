@@ -1,12 +1,12 @@
 /* ─────────────────────────────────────────────────────────
    아멘 제자 17기 졸업 · 초대장 콘텐츠
    일시·장소 확정 — 2026-09-20 (주) 오후예배 14:30 · 다윗성전
-   명단 128명 · 여정 사진 60장 반영. 초원별 영상은 연결 전까지 준비 안내 표시.
+   명단 128명 · 여정 사진 61장 반영. 수령한 간증 영상 4편 연결, 미수령 초원은 준비 안내 표시.
    ───────────────────────────────────────────────────────── */
 
 import type { GraduationData, JourneyPhoto, TestimonyGroup } from './types';
 
-/** 초원과 영상의 연결이 정해지기 전에는 요청 없이 준비 안내를 표시한다. */
+/** 수령한 영상은 경량본을 연결하고, 미수령 초원은 요청 없이 준비 안내를 표시한다. */
 function testimonyOf(number: number, name: string, src?: string, poster?: string): TestimonyGroup {
   return {
     id: `testimony-${number}`,
@@ -15,8 +15,8 @@ function testimonyOf(number: number, name: string, src?: string, poster?: string
   };
 }
 
-/** 03 여정 · 졸업식 — 제자들이 목사님께 한마디씩 전하는 영상 */
-const GRADUATION_SRC = import.meta.env.VITE_GRADUATION_VIDEO_URL || '/video/graduation.mp4';
+/** 03 여정 · 졸업 예배 — 공개 URL이 없으면 로컬 감사 통합본을 사용한다. */
+const GRADUATION_SRC = import.meta.env.VITE_GRADUATION_VIDEO_URL || '/video/graduation/preview.mp4';
 const GRADUATION_POSTER = import.meta.env.VITE_GRADUATION_VIDEO_POSTER || undefined;
 
 /**
@@ -71,19 +71,19 @@ export const G: GraduationData = {
     titleEn: 'Testimony',
     groups: [
       testimonyOf(1, '생사위주 초원', import.meta.env.VITE_TESTIMONY_1_VIDEO_URL, import.meta.env.VITE_TESTIMONY_1_VIDEO_POSTER),
-      testimonyOf(2, 'Onlyhim 초원', import.meta.env.VITE_TESTIMONY_2_VIDEO_URL, import.meta.env.VITE_TESTIMONY_2_VIDEO_POSTER),
+      testimonyOf(2, 'Onlyhim 초원', import.meta.env.VITE_TESTIMONY_2_VIDEO_URL || '/video/testimony/02/preview.mp4', import.meta.env.VITE_TESTIMONY_2_VIDEO_POSTER),
       testimonyOf(3, '하.군.남 초원', import.meta.env.VITE_TESTIMONY_3_VIDEO_URL, import.meta.env.VITE_TESTIMONY_3_VIDEO_POSTER),
       testimonyOf(4, '다모인 초원', import.meta.env.VITE_TESTIMONY_4_VIDEO_URL, import.meta.env.VITE_TESTIMONY_4_VIDEO_POSTER),
       testimonyOf(5, '은혜둥이 팔복둥이 초원', import.meta.env.VITE_TESTIMONY_5_VIDEO_URL, import.meta.env.VITE_TESTIMONY_5_VIDEO_POSTER),
       testimonyOf(6, '영음 초원', import.meta.env.VITE_TESTIMONY_6_VIDEO_URL, import.meta.env.VITE_TESTIMONY_6_VIDEO_POSTER),
       testimonyOf(7, '감사의 언니들 초원', import.meta.env.VITE_TESTIMONY_7_VIDEO_URL, import.meta.env.VITE_TESTIMONY_7_VIDEO_POSTER),
-      testimonyOf(8, '더드림 가조 초원', import.meta.env.VITE_TESTIMONY_8_VIDEO_URL, import.meta.env.VITE_TESTIMONY_8_VIDEO_POSTER),
-      testimonyOf(9, '어순종팀 초원', import.meta.env.VITE_TESTIMONY_9_VIDEO_URL, import.meta.env.VITE_TESTIMONY_9_VIDEO_POSTER),
-      testimonyOf(10, '부어부어 초원', import.meta.env.VITE_TESTIMONY_10_VIDEO_URL, import.meta.env.VITE_TESTIMONY_10_VIDEO_POSTER),
+      testimonyOf(8, '더드림 가조 초원', import.meta.env.VITE_TESTIMONY_8_VIDEO_URL || '/video/testimony/08/preview.mp4', import.meta.env.VITE_TESTIMONY_8_VIDEO_POSTER),
+      testimonyOf(9, '어순종팀 초원', import.meta.env.VITE_TESTIMONY_9_VIDEO_URL || '/video/testimony/09/preview.mp4', import.meta.env.VITE_TESTIMONY_9_VIDEO_POSTER),
+      testimonyOf(10, '부어부어 초원', import.meta.env.VITE_TESTIMONY_10_VIDEO_URL || '/video/testimony/10/preview.mp4', import.meta.env.VITE_TESTIMONY_10_VIDEO_POSTER),
     ],
   },
 
-  // 함께 걸어온 길 — 사진 캐러셀 3개 시기와 졸업식 영상
+  // 함께 걸어온 길 — 시기별 사진 캐러셀. 졸업 예배는 감사 영상도 함께 표시한다.
   journey: [
     {
       period: "2026 · 03", title: "입학식",
@@ -98,14 +98,13 @@ export const G: GraduationData = {
       photos: photosOf("fellowship", 18, "식사 모임")
     },
     {
-      // 아직 치르지 않은 일정이라 사진이 없다. 제자들이 목사님께 한마디씩 전하는
-      // 영상이 들어갈 자리로 둔다.
-      period: "2026 · 09", title: "졸업식",
-      desc: "제자들이 담임목사님께 전하는 한마디", now: true,
+      period: "2026 · 09 · 20", title: "졸업 예배",
+      photos: photosOf("graduation", 1, "졸업 예배"),
       video: {
         src: GRADUATION_SRC,
         poster: GRADUATION_POSTER,
         dur: "",
+        desc: "감사 영상 · 제자들이 담임목사님께 전하는 한마디",
         note: "준비중 입니다"
       }
     }
