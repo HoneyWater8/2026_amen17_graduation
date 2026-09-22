@@ -23,6 +23,7 @@
 | 2026-09-22 | [수령한 초원 간증 영상 4편 연결](./2026-09-22-testimony-video-sources.md) |
 | 2026-09-22 | [Vercel 영상 공개 배포와 단일 재생](./2026-09-22-vercel-video-deployment.md) |
 | 2026-09-22 | [봉투 클릭 후 첫 섹션 표시 시간 단축](./2026-09-22-faster-envelope-opening.md) |
+| 2026-09-22 | [봉투 개봉 속도 복원](./2026-09-22-envelope-opening-speed-restored.md) |
 
 ## 작성 규칙
 
