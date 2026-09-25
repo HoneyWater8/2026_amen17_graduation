@@ -24,6 +24,8 @@
 | 2026-09-22 | [Vercel 영상 공개 배포와 단일 재생](./2026-09-22-vercel-video-deployment.md) |
 | 2026-09-22 | [봉투 클릭 후 첫 섹션 표시 시간 단축](./2026-09-22-faster-envelope-opening.md) |
 | 2026-09-22 | [봉투 개봉 속도 복원](./2026-09-22-envelope-opening-speed-restored.md) |
+| 2026-09-26 | [초원별 간증 영상 10편 원본 정리](./2026-09-26-testimony-originals-intake.md) |
+| 2026-09-26 | [새 간증 영상 10편 변환과 공개 배포](./2026-09-26-testimony-video-deployment.md) |
 
 ## 작성 규칙
 

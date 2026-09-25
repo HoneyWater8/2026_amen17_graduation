@@ -36,5 +36,6 @@ orgId는 [[reference-repo-hanaro-festival]]의 Vercel 프로젝트와 **같은 �
 
 - **도메인이 `FE/index.html`에 하드코딩**되어 있습니다 (`og:url` · `og:image` · `twitter:image` 3곳). 도메인을 바꾸면 함께 교체.
 - **상시 공개 정책** — 열람 기한·자동 만료를 구현하지 않기로 했습니다(2026-09-07). 내릴 때는 대시보드에서 직접 제거합니다.
-- **영상은 Vercel Blob으로 배포** — 2026-09-22 공개 저장소 `amen17-graduation-videos` (`store_zw4d65fKlIme6aVE`, `icn1`)를 이 프로젝트에 연결했습니다. 간증 4편·감사 합본의 경량본을 공개하고 URL을 Production/Preview 환경 변수로 등록했습니다. Git 제외된 로컬 MP4가 Git 배포에 실리지 않는 문제를 해결한 것으로, 업로드는 [영상 자산 관리](../video-assets.md#공개-배포-vercel-blob)를 따릅니다. Hobby 플랜을 유지합니다.
+- **영상은 Vercel Blob으로 배포** — 2026-09-22 공개 저장소 `amen17-graduation-videos` (`store_zw4d65fKlIme6aVE`, `icn1`)를 이 프로젝트에 연결했습니다. 2026-09-26 새 간증 10편의 경량본을 업로드하고 URL을 Production/Preview 환경 변수로 등록·교체했습니다. 감사 합본은 기존 주소를 유지하며, 이전 간증 Blob 4개도 복구용으로 보존합니다. Git 제외된 로컬 MP4가 Git 배포에 실리지 않는 문제를 해결한 것으로, 업로드는 [영상 자산 관리](../video-assets.md#공개-배포-vercel-blob)를 따릅니다. Hobby 플랜을 유지합니다.
 - **Blob CLI 인증** — CLI 59.25.0이 내려준 `.env.local`에 OIDC 토큰은 있으나 저장소 ID가 누락되어 `BLOB_STORE_ID="store_zw4d65fKlIme6aVE"`를 추가했습니다. 파일은 Git 제외이며 토큰은 출력·커밋하지 않습니다. 업로드 후 앱에는 `VITE_*_VIDEO_URL` 공개 주소만 전달합니다.
+- **토큰 만료 시** — 2026-09-26 기존 인증으로 Blob 업로드가 거절되어 `vercel env pull .env.local --yes`로 갱신한 뒤 성공했습니다. CLI 60.0.1은 로컬 전용 `BLOB_STORE_ID`와 카카오 키를 유지했습니다. 갱신 후에도 Git 제외 여부와 `.env.example` 예외를 확인합니다.

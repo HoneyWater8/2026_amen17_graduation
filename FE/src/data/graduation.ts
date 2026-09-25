@@ -1,12 +1,12 @@
 /* ─────────────────────────────────────────────────────────
    아멘 제자 17기 졸업 · 초대장 콘텐츠
    일시·장소 확정 — 2026-09-20 (주) 오후예배 14:30 · 다윗성전
-   명단 128명 · 여정 사진 61장 반영. 수령한 간증 영상 4편 연결, 미수령 초원은 준비 안내 표시.
+   명단 128명 · 여정 사진 61장 · 초원별 새 간증 영상 10편 반영.
    ───────────────────────────────────────────────────────── */
 
 import type { GraduationData, JourneyPhoto, TestimonyGroup } from './types';
 
-/** 수령한 영상은 경량본을 연결하고, 미수령 초원은 요청 없이 준비 안내를 표시한다. */
+/** 초원별 경량본을 사용하며, 영상 로드 실패 시 준비 안내를 표시한다. */
 function testimonyOf(number: number, name: string, src?: string, poster?: string): TestimonyGroup {
   return {
     id: `testimony-${number}`,
@@ -70,13 +70,13 @@ export const G: GraduationData = {
     title: '졸업 간증 영상',
     titleEn: 'Testimony',
     groups: [
-      testimonyOf(1, '생사위주 초원', import.meta.env.VITE_TESTIMONY_1_VIDEO_URL, import.meta.env.VITE_TESTIMONY_1_VIDEO_POSTER),
+      testimonyOf(1, '생사위주 초원', import.meta.env.VITE_TESTIMONY_1_VIDEO_URL || '/video/testimony/01/preview.mp4', import.meta.env.VITE_TESTIMONY_1_VIDEO_POSTER),
       testimonyOf(2, 'Onlyhim 초원', import.meta.env.VITE_TESTIMONY_2_VIDEO_URL || '/video/testimony/02/preview.mp4', import.meta.env.VITE_TESTIMONY_2_VIDEO_POSTER),
-      testimonyOf(3, '하.군.남 초원', import.meta.env.VITE_TESTIMONY_3_VIDEO_URL, import.meta.env.VITE_TESTIMONY_3_VIDEO_POSTER),
-      testimonyOf(4, '다모인 초원', import.meta.env.VITE_TESTIMONY_4_VIDEO_URL, import.meta.env.VITE_TESTIMONY_4_VIDEO_POSTER),
-      testimonyOf(5, '은혜둥이 팔복둥이 초원', import.meta.env.VITE_TESTIMONY_5_VIDEO_URL, import.meta.env.VITE_TESTIMONY_5_VIDEO_POSTER),
-      testimonyOf(6, '영음 초원', import.meta.env.VITE_TESTIMONY_6_VIDEO_URL, import.meta.env.VITE_TESTIMONY_6_VIDEO_POSTER),
-      testimonyOf(7, '감사의 언니들 초원', import.meta.env.VITE_TESTIMONY_7_VIDEO_URL, import.meta.env.VITE_TESTIMONY_7_VIDEO_POSTER),
+      testimonyOf(3, '하.군.남 초원', import.meta.env.VITE_TESTIMONY_3_VIDEO_URL || '/video/testimony/03/preview.mp4', import.meta.env.VITE_TESTIMONY_3_VIDEO_POSTER),
+      testimonyOf(4, '다모인 초원', import.meta.env.VITE_TESTIMONY_4_VIDEO_URL || '/video/testimony/04/preview.mp4', import.meta.env.VITE_TESTIMONY_4_VIDEO_POSTER),
+      testimonyOf(5, '은혜둥이 팔복둥이 초원', import.meta.env.VITE_TESTIMONY_5_VIDEO_URL || '/video/testimony/05/preview.mp4', import.meta.env.VITE_TESTIMONY_5_VIDEO_POSTER),
+      testimonyOf(6, '영음 초원', import.meta.env.VITE_TESTIMONY_6_VIDEO_URL || '/video/testimony/06/preview.mp4', import.meta.env.VITE_TESTIMONY_6_VIDEO_POSTER),
+      testimonyOf(7, '감사의 언니들 초원', import.meta.env.VITE_TESTIMONY_7_VIDEO_URL || '/video/testimony/07/preview.mp4', import.meta.env.VITE_TESTIMONY_7_VIDEO_POSTER),
       testimonyOf(8, '더드림 가조 초원', import.meta.env.VITE_TESTIMONY_8_VIDEO_URL || '/video/testimony/08/preview.mp4', import.meta.env.VITE_TESTIMONY_8_VIDEO_POSTER),
       testimonyOf(9, '어순종팀 초원', import.meta.env.VITE_TESTIMONY_9_VIDEO_URL || '/video/testimony/09/preview.mp4', import.meta.env.VITE_TESTIMONY_9_VIDEO_POSTER),
       testimonyOf(10, '부어부어 초원', import.meta.env.VITE_TESTIMONY_10_VIDEO_URL || '/video/testimony/10/preview.mp4', import.meta.env.VITE_TESTIMONY_10_VIDEO_POSTER),

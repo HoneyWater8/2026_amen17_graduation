@@ -14,7 +14,7 @@
 
 ## 현재 상태
 
-**디자인·명단·여정 사진 반영 완료. 수령한 간증 영상 4편과 감사 합본을 Vercel Blob으로 공개 배포했습니다.**
+**디자인·명단·여정 사진 반영 완료. 2026-09-25 수령한 새 간증 영상 10편을 변환해 Vercel Blob으로 공개 배포했습니다. 간증 10편과 졸업 예배 감사 합본을 재생할 수 있습니다.**
 
 졸업 예배는 2026-09-20에 진행되었으며 명단 128명, 여정 사진 61장이 반영되어 있습니다. 초원명과 영상 등 콘텐츠는 [`FE/src/data/graduation.ts`](./FE/src/data/graduation.ts)에서 변경합니다.
 
@@ -28,7 +28,7 @@
 | 여정 사진 | ✅ 61장 배치 (입학식 23 · 하나로가족한마당 19 · 식사 모임 18 · 졸업 예배 1) |
 | 공유 썸네일 · 탭 아이콘 | ✅ 1200×630 썸네일, 왁스 씰 favicon |
 | 졸업 예배 영상 | ✅ 감사 영상 7개 통합본의 경량·고화질 파일 준비, 사진 아래 경량본 연결 및 Vercel Blob 공개 배포 |
-| 졸업 간증 영상 | ✅ 초원별 10개 카드와 실제 초원명, 수령한 02·08·09·10의 경량본 Vercel Blob 공개 배포<br>⏳ 나머지 6개 초원 영상 수령 |
+| 졸업 간증 영상 | ✅ 초원별 10개 카드와 실제 초원명<br>✅ 2026-09-26 새 수령본 10편의 변환·공개 URL 등록·교체 |
 | 열람 기한 처리 | ❌ **구현 안 함** — 배포를 직접 내릴 때까지 상시 공개 (2026-09-07 결정) |
 | 어워드(시상) 섹션 | ⏳ 후속 과제 |
 
@@ -193,7 +193,7 @@ git push origin main      # → Vercel이 자동 빌드·배포
 
 | 변수 | 용도 | 없을 때 |
 |---|---|---|
-| `VITE_TESTIMONY_1_VIDEO_URL` ~ `VITE_TESTIMONY_10_VIDEO_URL` | 초원별 졸업 간증 영상 (§02) | 수령한 02·08·09·10은 로컬 경량본 사용. 미수령·로드 실패 시 준비 안내 |
+| `VITE_TESTIMONY_1_VIDEO_URL` ~ `VITE_TESTIMONY_10_VIDEO_URL` | 초원별 졸업 간증 영상 (§02) | 01~10 모두 로컬 경량본 사용. 로드 실패 시 준비 안내 |
 | `VITE_TESTIMONY_1_VIDEO_POSTER` ~ `VITE_TESTIMONY_10_VIDEO_POSTER` | 초원별 영상 포스터 (선택) | 검은 배경 |
 | `VITE_GRADUATION_VIDEO_URL` | 졸업 예배 감사 영상 (§03 여정 마지막) | `/video/graduation/preview.mp4` 사용. 파일이 없으면 준비 안내 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
@@ -299,14 +299,14 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 
 영상 원본은 `assets/video-originals/`에 보존하고, `scripts/prepare-videos.py`로 재생용 `preview.mp4`와 `full.mp4`를 만듭니다. 초원별 수령 현황·파일 경로·감사 통합본 순서·재생성 방법은 [영상 자산 관리](./docs/video-assets.md)를 참고하세요. 작은 화면/전체화면에 따른 화질 전환 기능은 아직 구현하지 않았습니다.
 
-수령한 초원 02·08·09·10은 `/video/testimony/NN/preview.mp4`를 기본 재생 경로로 사용합니다. 초원별 공개 URL을 지정하면 그 주소를 우선합니다 (예: 초원 1은 `VITE_TESTIMONY_1_VIDEO_URL`, 자세한 설정은 `FE/.env.example`).
+초원 01~10은 `/video/testimony/NN/preview.mp4`를 기본 재생 경로로 사용합니다. 초원별 공개 URL을 지정하면 그 주소를 우선합니다 (예: 초원 1은 `VITE_TESTIMONY_1_VIDEO_URL`, 자세한 설정은 `FE/.env.example`). 2026-09-25 새 수령본은 `assets/video-originals/testimony/`에 정본 초원명으로 보관했으며 이전 원본 4편은 `assets/video-originals/archive/2026-09-25/testimony/`에 보존했습니다. 현재 재생본은 새 수령본 10편 기준입니다.
 
 | 방식 | 방법 | 적합한 경우 |
 |---|---|---|
 | 로컬 파일 | `FE/public/video/` 아래에 두고 해당 초원의 URL을 `/video/파일명.mp4`로 지정 | 로컬 확인 (`public/video/*`는 git 제외) |
 | **Vercel Blob (현재 배포 방식)** | 영상 업로드 후 Production/Preview 환경 변수에 공개 주소 지정 | 배포용 영상 |
 
-공개 URL과 로컬 연결이 모두 없거나 재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. **2026-09-22 수령한 간증 4편과 감사 합본의 경량본을 Vercel Blob에 업로드하고 Production/Preview URL을 등록했습니다.** 기존 환경 변수를 유지하면 이후 Git 배포에서도 영상이 연결됩니다. 영상 교체 시에는 새 파일 업로드 → 환경 변수 URL 변경 → `main` 커밋·푸시를 통한 자동 배포 순서로 반영합니다. 공개 경로와 절차는 [영상 자산 관리](./docs/video-assets.md#공개-배포-vercel-blob)를 참고하세요. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
+재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. **2026-09-26 새 간증 10편의 경량본을 Vercel Blob에 업로드하고 Production/Preview URL을 등록·교체했습니다. 감사 합본은 기존 주소를 유지합니다.** 기존 환경 변수를 유지하면 이후 Git 배포에서도 영상이 연결됩니다. 영상 교체 시에는 새 파일 업로드 → 환경 변수 URL 변경 → `main` 커밋·푸시를 통한 자동 배포 순서로 반영합니다. 공개 경로와 절차는 [영상 자산 관리](./docs/video-assets.md#공개-배포-vercel-blob)를 참고하세요. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
 
 **졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 Vercel Blob 경량본을 재생합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/preview.mp4`를 사용합니다. 고화질본 업로드와 전체화면 화질 전환은 후속 작업입니다.
 
@@ -389,7 +389,8 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [x] ~~졸업생 실명 명단 반영~~ — 128명, 2026-09-11
 - [x] 졸업 예배 감사 통합본 (§03) 공개 URL 업로드 — 2026-09-22 Vercel Blob 경량본 배포
 - [ ] 추가 졸업 예배 사진 수령 후 `02.jpg`부터 배치
-- [ ] 나머지 6개 초원 간증 영상 수령 — 01·03·04·05·06·07
+- [x] 간증 영상 10편 전부 수령·원본 정리 — 2026-09-25 새 수령본 기준, 이전 4편 보존
+- [x] 2026-09-25 새 간증 10편의 재생본 변환·공개 URL 등록·교체 — 2026-09-26
 - [x] 졸업 간증 영상 공개 URL 업로드 — 2026-09-22 수령한 02·08·09·10의 Vercel Blob 경량본 배포
 - [ ] 작은 화면에서는 경량본, 전체화면에서는 고화질본으로 재생 위치를 유지하며 전환
 - [x] ~~카카오 공유용 `thumbnail.png` 제작~~ — 1200×630, 2026-09-11

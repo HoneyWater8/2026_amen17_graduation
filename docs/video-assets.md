@@ -1,6 +1,6 @@
 # 영상 자산 관리
 
-2026-09-22 기준. 초원 이름과 순서는 사용자가 전달한 정본을 따른다.
+2026-09-26 기준. 초원 이름과 순서는 사용자가 전달한 정본을 따른다. **새 초원별 간증 영상 10편의 원본 정리·재생용 변환·Vercel Blob 공개 업로드 완료. 간증 10편과 감사 합본 1편을 연결한다.**
 
 ## 디렉터리
 
@@ -8,11 +8,18 @@
 assets/
 ├─ video-originals/                  # 받은 원본. Git 제외, 삭제하지 않음
 │  ├─ inventory.json                 # 수령 파일명 → 정리된 경로 · SHA-256 · 바이트 수
-│  ├─ testimony/
+│  ├─ testimony/                     # 2026-09-25 새 수령본 10편
+│  │  ├─ 01_생사위주 초원.mp4
 │  │  ├─ 02_Onlyhim 초원.mp4
+│  │  ├─ 03_하.군.남 초원.mp4
+│  │  ├─ 04_다모인 초원.mp4
+│  │  ├─ 05_은혜둥이 팔복둥이 초원.mp4
+│  │  ├─ 06_영음 초원.mp4
+│  │  ├─ 07_감사의 언니들 초원.mp4
 │  │  ├─ 08_더드림 가조 초원.mp4
 │  │  ├─ 09_어순종팀 초원.mp4
 │  │  └─ 10_부어부어 초원.mp4
+│  ├─ archive/2026-09-25/testimony/   # 교체 전 02·08·09·10 원본 4편 보존
 │  └─ gratitude/
 │     ├─ 01-장년.mp4
 │     ├─ 02-청년.mp4
@@ -23,20 +30,17 @@ assets/
 │     └─ 07-장년.mp4                # 2026-09-22 추가 수령분
 └─ video-work/                       # 변환 중간 파일 · 로그 · 검증 결과. Git 제외
 
-FE/public/video/                    # 재생용 파일만 배치. Git 제외
+FE/public/video/                    # 재생용: 새 간증 10편과 감사 합본, 총 22개 파일
 ├─ testimony/
-│  ├─ 02/{preview,full}.mp4
-│  ├─ 08/{preview,full}.mp4
-│  ├─ 09/{preview,full}.mp4
-│  └─ 10/{preview,full}.mp4
+│  └─ 01~10/{preview,full}.mp4
 └─ graduation/{preview,full}.mp4     # 감사 영상 7개를 합친 영상
 ```
 
-`public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않는다. 배포용 경량본 5개는 Vercel Blob에 올렸으며, Git 빌드는 환경 변수의 공개 URL로 연결한다.
+`public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않는다. 현재 연결된 배포용 경량본 11개는 Vercel Blob에 올렸으며, Git 빌드는 환경 변수의 공개 URL로 연결한다.
 
 ## 공개 배포 (Vercel Blob)
 
-**2026-09-22 사용자의 공개 업로드 승인 후 간증 4편과 감사 합본 1편을 배포했다.** 페이지와 영상 모두 Vercel에서 제공한다. 기존 Git 배포에서 영상 경로가 404였던 원인은 `FE/public/video/`의 파일이 Git 제외 대상이라 원격 빌드에 없었기 때문이다.
+**2026-09-22 최초 공개 업로드 후, 2026-09-26 사용자 요청으로 새 간증 10편의 경량본을 추가 업로드하고 Production/Preview URL을 등록·교체했다. 감사 합본 1편은 기존 주소를 유지한다.** 페이지와 영상 모두 Vercel에서 제공한다. 기존 Git 배포에서 영상 경로가 404였던 원인은 `FE/public/video/`의 파일이 Git 제외 대상이라 원격 빌드에 없었기 때문이다.
 
 | 항목 | 값 |
 |---|---|
@@ -44,20 +48,27 @@ FE/public/video/                    # 재생용 파일만 배치. Git 제외
 | Blob 저장소 | `amen17-graduation-videos` / `store_zw4d65fKlIme6aVE` |
 | 접근 · 리전 | Public · `icn1` (서울) |
 | 공개 주소 기준 | `https://zw4d65fklime6ave.public.blob.vercel-storage.com/` |
-| 배포 파일 | 경량본 5개, 총 104,466,463 B (99.63 MiB) |
+| 현재 연결 파일 | 경량본 11개, 총 221,557,417 B (211.29 MiB) |
+| 저장소 보존 파일 | 이전 간증 4개 포함 총 15개, 245.62 MiB |
 | 적용 환경 | Production · Preview. Development는 로컬 파일 기본 경로 유지 |
 
 다음 경로를 위 공개 주소 기준에 이어 붙인 전체 URL이 각 환경 변수의 값이다. 파일명의 12자리 값은 로컬 파일 SHA-256의 앞부분이며, 교체 시 새 경로를 사용해 기존 캐시와 구분한다.
 
 | 환경 변수 | Blob 경로 |
 |---|---|
-| `VITE_TESTIMONY_2_VIDEO_URL` | `video/testimony/02/preview-3df9baf99f02.mp4` |
-| `VITE_TESTIMONY_8_VIDEO_URL` | `video/testimony/08/preview-f47fcfaf6b53.mp4` |
-| `VITE_TESTIMONY_9_VIDEO_URL` | `video/testimony/09/preview-1e5bec65b25d.mp4` |
-| `VITE_TESTIMONY_10_VIDEO_URL` | `video/testimony/10/preview-5d3111dbf9b0.mp4` |
+| `VITE_TESTIMONY_1_VIDEO_URL` | `video/testimony/01/preview-879bc5088505.mp4` |
+| `VITE_TESTIMONY_2_VIDEO_URL` | `video/testimony/02/preview-04aa45879a90.mp4` |
+| `VITE_TESTIMONY_3_VIDEO_URL` | `video/testimony/03/preview-17266ff8e4c1.mp4` |
+| `VITE_TESTIMONY_4_VIDEO_URL` | `video/testimony/04/preview-31d1eace182c.mp4` |
+| `VITE_TESTIMONY_5_VIDEO_URL` | `video/testimony/05/preview-32dd91b2de44.mp4` |
+| `VITE_TESTIMONY_6_VIDEO_URL` | `video/testimony/06/preview-52346a165ed0.mp4` |
+| `VITE_TESTIMONY_7_VIDEO_URL` | `video/testimony/07/preview-c0c92f2efeaa.mp4` |
+| `VITE_TESTIMONY_8_VIDEO_URL` | `video/testimony/08/preview-471515969d0c.mp4` |
+| `VITE_TESTIMONY_9_VIDEO_URL` | `video/testimony/09/preview-b32b1cfe1e0d.mp4` |
+| `VITE_TESTIMONY_10_VIDEO_URL` | `video/testimony/10/preview-ca24debc3ed7.mp4` |
 | `VITE_GRADUATION_VIDEO_URL` | `video/graduation/preview-2b5c48754661.mp4` |
 
-이미 등록한 환경 변수를 유지하면 이후 Git 푸시에도 영상이 연결된다. **원본과 `full.mp4`는 업로드하지 않았다.** 현재 플레이어가 사용하는 경량본만 공개했으며, 고화질본 공개 배포는 전체화면 화질 전환 구현과 함께 진행한다.
+이미 등록한 환경 변수를 유지하면 이후 Git 푸시에도 영상이 연결된다. **원본과 `full.mp4`는 업로드하지 않았다.** 현재 플레이어가 사용하는 경량본만 공개했으며, 이전 간증 Blob 4개는 복구용으로 보존한다. 새 간증의 고화질본만 약 2.63 GiB이므로 현재 저장소에는 올리지 않았다. 고화질본 공개 배포는 전체화면 화질 전환 구현과 함께 진행한다.
 
 간증·감사 영상을 통틀어 한 번에 하나만 재생한다. 새 영상의 재생이 시작되면 공통 `VideoSlot`이 다른 영상들을 일시정지하며, 재생 위치는 초기화하지 않는다.
 
@@ -66,55 +77,69 @@ FE/public/video/                    # 재생용 파일만 배치. Git 제외
 1. 아래 변환 절차로 로컬 재생본을 만들고 재생·길이·순서를 확인한다.
 2. `FE/`에서 로그인된 Vercel CLI로 기존 Blob 저장소에 업로드한다. 예: `npx vercel blob put public/video/testimony/02/preview.mp4 --access public --pathname video/testimony/02/preview-<새 SHA256 앞 12자리>.mp4 --content-type video/mp4 --scope su-heon-choi-s-projects`.
 3. 반환된 공개 URL에 `200`, `video/mp4`, 정확한 파일 크기, `Range` 요청의 `206` 응답을 확인한다.
-4. 해당 `VITE_*_VIDEO_URL`을 Production/Preview에 등록하거나 갱신한다. 예: `npx vercel env add VITE_TESTIMONY_2_VIDEO_URL production,preview --value <공개 URL> --force --yes --no-sensitive --scope su-heon-choi-s-projects`. 미수령 초원은 기존 환경 변수 연결을 사용하므로 영상 URL만 등록하면 된다.
+4. 해당 `VITE_*_VIDEO_URL`을 Production/Preview에 등록하거나 갱신한다. 예: `npx vercel env add VITE_TESTIMONY_2_VIDEO_URL production,preview --value <공개 URL> --force --yes --no-sensitive --scope su-heon-choi-s-projects`. 미연결 초원도 기존 환경 변수 연결을 사용하므로 영상 URL을 등록하면 된다.
 5. 코드·영상 관리 문서 등 변경 사항을 `main`에 커밋·푸시해 Vercel 자동 배포로 반영한다. 직접 배포 명령은 사용하지 않는다. Vite는 빌드 시 URL을 넣으므로 **환경 변수 변경만으로 기존 배포가 바뀌지는 않는다.**
 6. 실제 프로덕션 페이지에서 재생과 구간 이동을 확인한다. 새 배포가 검증될 때까지 기존 Blob을 삭제하지 않는다.
 
-CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 59.25.0의 저장소 연결은 `VERCEL_OIDC_TOKEN`과 `BLOB_READ_WRITE_TOKEN`을 내려주지만 `BLOB_STORE_ID`는 빠져 있었다. 두 OIDC 값이 모두 필요하다는 오류가 나면 `.env.local`에 `BLOB_STORE_ID="store_zw4d65fKlIme6aVE"`를 함께 지정한다. 인증 토큰은 문서·Git·프론트엔드 번들에 넣지 않으며 `VITE_` 접두사도 붙이지 않는다. `vercel env pull` 등이 `.gitignore` 끝에 `.env*`를 추가하면 기존 `!.env.example` 예외가 유지되도록 중복 줄을 제거한다.
+CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 59.25.0의 저장소 연결은 `VERCEL_OIDC_TOKEN`과 `BLOB_READ_WRITE_TOKEN`을 내려주지만 `BLOB_STORE_ID`는 빠져 있었다. 인증 만료로 접근 거절이 발생하면 `vercel env pull .env.local --yes`로 갱신한다. 2026-09-26 CLI 60.0.1에서 갱신 후 업로드를 확인했다. 두 OIDC 값이 모두 필요하다는 오류가 나면 `.env.local`에 `BLOB_STORE_ID="store_zw4d65fKlIme6aVE"`를 함께 지정한다. 인증 토큰은 문서·Git·프론트엔드 번들에 넣지 않으며 `VITE_` 접두사도 붙이지 않는다. `vercel env pull` 등이 `.gitignore` 끝에 `.env*`를 추가하면 기존 `!.env.example` 예외가 유지되도록 중복 줄을 제거한다.
 
 현재 Hobby 플랜을 유지한다. 무료 포함량은 저장 공간 1GB, 월 Blob 전송량 10GB이며, 한도를 넘으면 접근이 제한될 수 있으므로 Vercel 대시보드에서 사용량을 확인한다. [Vercel Blob 사용량·요금](https://vercel.com/docs/vercel-blob/usage-and-pricing)
 
 ## 초원별 수령 현황
 
-| 번호 | 정본 이름 | 받은 파일 | 재생 파일 디렉터리 |
+| 번호 | 정본 이름 | 2026-09-25 받은 파일 | 현재 재생본 상태 |
 |---|---|---|---|
-| 01 | 생사위주 초원 | 미수령 | 미생성 |
-| 02 | Onlyhim 초원 | `청년 1팀_OnlyHim.mp4` | `/video/testimony/02/` |
-| 03 | 하.군.남 초원 | 미수령 | 미생성 |
-| 04 | 다모인 초원 | 미수령 | 미생성 |
-| 05 | 은혜둥이 팔복둥이 초원 | 미수령 | 미생성 |
-| 06 | 영음 초원 | 미수령 | 미생성 |
-| 07 | 감사의 언니들 초원 | 미수령 | 미생성 |
-| 08 | 더드림 가조 초원 | `청년 4팀_더드림가조.mp4` | `/video/testimony/08/` |
-| 09 | 어순종팀 초원 | `장년 여자_어순종.mp4` | `/video/testimony/09/` |
-| 10 | 부어부어 초원 | `청년 5팀_부어부어.mp4` | `/video/testimony/10/` |
+| 01 | 생사위주 초원 | `생사위주.mp4` | `/video/testimony/01/` — 새 수령본 변환·공개 연결 완료 |
+| 02 | Onlyhim 초원 | `Onlyhim.mp4` | `/video/testimony/02/` — 새 수령본 변환·공개 연결 완료 |
+| 03 | 하.군.남 초원 | `하군남.mp4` | `/video/testimony/03/` — 새 수령본 변환·공개 연결 완료 |
+| 04 | 다모인 초원 | `다모인.mp4` | `/video/testimony/04/` — 새 수령본 변환·공개 연결 완료 |
+| 05 | 은혜둥이 팔복둥이 초원 | `은혜둥이 팔복둥이.mp4` | `/video/testimony/05/` — 새 수령본 변환·공개 연결 완료 |
+| 06 | 영음 초원 | `영음.mp4` | `/video/testimony/06/` — 새 수령본 변환·공개 연결 완료 |
+| 07 | 감사의 언니들 초원 | `감사의 언니들.mp4` | `/video/testimony/07/` — 새 수령본 변환·공개 연결 완료 |
+| 08 | 더드림 가조 초원 | `더드림 가조.mp4` | `/video/testimony/08/` — 새 수령본 변환·공개 연결 완료 |
+| 09 | 어순종팀 초원 | `어순종팀.mp4` | `/video/testimony/09/` — 새 수령본 변환·공개 연결 완료 |
+| 10 | 부어부어 초원 | `부어부어.mp4` | `/video/testimony/10/` — 새 수령본 변환·공개 연결 완료 |
 
-원본의 청년 팀 번호는 화면의 초원 번호와 다르다. 새 영상을 받으면 위 번호를 기준으로 `assets/video-originals/testimony/NN_정본 초원명.mp4`에 보관한다. 미수령 초원의 빈 영상·빈 디렉터리는 만들지 않는다.
+원본의 청년 팀 번호는 화면의 초원 번호와 다르다. 새 영상을 받으면 위 번호를 기준으로 `assets/video-originals/testimony/NN_정본 초원명.mp4`에 보관한다.
+
+이번 수령 폴더는 `수헌이전달간증`이며 파일명과 확인한 영상 내용이 초원별 간증에 해당해 `testimony/`로 분류했다. 감사 합본용 `gratitude/` 7편과는 구분한다. 새 파일은 10편 모두 H.264이며 1080p 8편, 720p 2편(04·10), 총 2,819,257,855 B(약 2.63 GiB)다.
+
+기존 간증 02·08·09·10과 새 수령본은 해시·길이가 모두 달라 중복으로 취급하지 않았다. 이전 원본은 `archive/2026-09-25/testimony/`로 옮겨 그대로 보존했다. `inventory.json`에는 기존 항목의 보관 경로를 갱신하고 새 10편의 수령 파일명·수령 경로·날짜·SHA-256·크기를 추가했다. 보존 원본은 현재 간증 10 + 이전 간증 4 + 감사 7 = 총 21개다.
+
+**현재 화면과 Blob에는 새 간증 10편이 연결되어 있다.** 원본 정리 이후 `testimony` 변환을 다시 실행하고 20개 결과를 검증했다. 새 경량본 10개를 해시 기반 경로로 업로드하고 모든 초원의 공개 URL을 반영했다.
 
 ## 재생용 규격
 
+간증은 2026-09-25 새 수령본을 2026-09-26 변환한 결과이며, 감사 합본은 2026-09-22 생성본을 유지한다.
+
 | 종류 | preview.mp4 | full.mp4 |
 |---|---|---|
-| 간증 영상 4개 | 960×540, H.264, CRF 24, 원본의 24fps·AAC 음성 유지 | 1280×720, 원본 H.264/AAC 스트림을 재압축 없이 보존 |
+| 새 간증 영상 10개 | 960×540, H.264, CRF 24, 원본의 24·29.97·30fps 및 AAC 음성 유지 | 1920×1080 8개 / 1280×720 2개(04·10), 원본 H.264/AAC 스트림을 재압축 없이 보존 |
 | 감사 영상 통합본 | 960×540, H.264, CRF 24, 30fps | 2560×1440, H.264, CRF 19, 30fps, AAC 48kHz 스테레오 |
 
 모든 파일은 MP4의 재생 정보(`moov`)를 앞에 둔 faststart 형식이다. 경량본과 고화질본의 영상 내용·시작 지점·길이를 맞춰 나중에 재생 위치를 유지하며 전환할 수 있게 했다.
 
 감사 영상 원본은 720p·1080p·정사각형·2336×1080 영상이 섞여 있다. 가장 넓은 원본을 줄이지 않고 16:9 화면 안에 담기 위해 통합 고화질본을 2560×1440으로 만들었다. 작은 원본을 확대해도 원본에 없던 디테일이 생기는 것은 아니다. 비율이 다른 영상은 자르거나 늘이지 않고 여백을 둔다. 회전 정보는 실제 화면 방향에 반영하며, HDR 영상은 SDR BT.709로 변환한다.
 
-졸업 예배와 간증 초원 02·08·09·10은 배포 환경에서 Vercel Blob의 경량본 URL을 사용한다. 환경 변수가 없는 로컬에서는 각각 `/video/graduation/preview.mp4`, `/video/testimony/NN/preview.mp4`를 사용한다. 미수령 간증 초원에는 준비 안내를 유지한다. 고화질본 공개 업로드와 전체화면에서 고화질본으로 소스를 전환하는 기능은 후속 작업이다.
+졸업 예배와 간증 초원 01~10은 배포 환경에서 Vercel Blob의 경량본 URL을 사용한다. 환경 변수가 없는 로컬에서는 각각 `/video/graduation/preview.mp4`, `/video/testimony/NN/preview.mp4`를 사용한다. 로드 실패 시 준비 안내를 표시한다. 고화질본 공개 업로드와 전체화면에서 고화질본으로 소스를 전환하는 기능은 후속 작업이다.
 
 ### 생성 결과
 
 | 영상 | 길이 | preview | full |
 |---|---|---|---|
-| 02 Onlyhim 초원 | 2분 20초 | 10.25 MiB | 33.96 MiB |
-| 08 더드림 가조 초원 | 1분 23초 | 9.40 MiB | 19.64 MiB |
-| 09 어순종팀 초원 | 1분 49초 | 9.33 MiB | 26.40 MiB |
-| 10 부어부어 초원 | 1분 10초 | 5.35 MiB | 16.78 MiB |
+| 01 생사위주 초원 | 2분 11초 | 13.10 MiB | 310.99 MiB |
+| 02 Onlyhim 초원 | 2분 22초 | 13.97 MiB | 336.28 MiB |
+| 03 하.군.남 초원 | 2분 11초 | 14.58 MiB | 312.33 MiB |
+| 04 다모인 초원 | 1분 51초 | 22.30 MiB | 25.72 MiB |
+| 05 은혜둥이 팔복둥이 초원 | 2분 15초 | 13.38 MiB | 322.54 MiB |
+| 06 영음 초원 | 2분 00초 | 13.14 MiB | 290.17 MiB |
+| 07 감사의 언니들 초원 | 2분 30초 | 17.35 MiB | 360.95 MiB |
+| 08 더드림 가조 초원 | 2분 19초 | 12.80 MiB | 330.80 MiB |
+| 09 어순종팀 초원 | 2분 36초 | 17.10 MiB | 374.34 MiB |
+| 10 부어부어 초원 | 1분 44초 | 8.27 MiB | 24.54 MiB |
 | 졸업 예배 감사 통합본 | 12분 33초 | 65.30 MiB | 576.98 MiB |
 
-간증 경량본 4개의 합계는 34.33 MiB로 고화질본 합계 96.79 MiB보다 약 65% 작다. 감사 통합 고화질본은 해상도 통일과 H.264 변환으로 원본 합계보다 커졌으며, 졸업 예배 항목에는 경량본을 연결했다.
+새 간증 경량본 10개의 합계는 145.99 MiB로, 고화질본 합계 2688.67 MiB보다 약 94.6% 작다. 원본 해상도를 유지한 파일은 로컬에 보관하며 공개 화면에는 경량본을 연결했다.
 
 ## 감사 통합본 구성
 
