@@ -21,8 +21,7 @@ export function Closing({ active }: ClosingProps) {
   const lines = G.closing.lines;
 
   return (
-    // 작은 화면에서도 고정 공유 버튼이 하단 제작자 문구를 가리지 않게 공간을 둔다.
-    <Section label="05 Closing" bg={EV.paper} pad="52px 22px 92px">
+    <Section label="05 Closing" bg={EV.paper} pad="52px 22px 24px">
       <div style={{ flex: 1 }} />
 
       <Reveal active={active}>
@@ -64,14 +63,20 @@ export function Closing({ active }: ClosingProps) {
 
       <div style={{ flex: 1 }} />
 
-      <div style={{
-        textAlign: 'center', fontFamily: FF.serif, fontSize: 11,
-        letterSpacing: 0.5, color: EV.inkSoft, opacity: 0.85,
-      }}>© {G.meta.org} · {G.meta.cohortEn} · {G.meta.year}</div>
-      <div style={{
-        marginTop: 6, textAlign: 'center', fontFamily: FF.latin, fontSize: 9,
-        letterSpacing: 1.2, lineHeight: 1.6, color: EV.inkSoft, opacity: 0.85,
-      }}>{G.closing.credit}</div>
+      {/* 하단에 붙이되, 양옆에 공유 버튼 공간을 남겨 작은 화면에서는 문구만 줄바꿈한다. */}
+      <footer data-closing-footer style={{
+        alignSelf: 'center', width: 'calc(100% - 112px)', flexShrink: 0,
+        textAlign: 'center', color: EV.inkSoft, opacity: 0.85,
+        wordBreak: 'keep-all', textWrap: 'balance',
+      }}>
+        <div style={{
+          fontFamily: FF.serif, fontSize: 11, letterSpacing: 0.5, lineHeight: 1.6,
+        }}>© {G.meta.org} · {G.meta.cohortEn} · {G.meta.year}</div>
+        <div style={{
+          marginTop: 6, fontFamily: FF.latin, fontSize: 9,
+          letterSpacing: 1, lineHeight: 1.6,
+        }}>{G.closing.credit}</div>
+      </footer>
     </Section>
   );
 }

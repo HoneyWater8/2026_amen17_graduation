@@ -317,7 +317,7 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 
 **졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 Vercel Blob 경량본을 재생하고 전체화면에서는 `VITE_GRADUATION_VIDEO_FULL_URL`로 전환합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/{preview,hd}.mp4`를 사용합니다.
 
-**맺는 말씀** — 제목은 `G.closing.label`, 제작자 문구는 `G.closing.credit`에서 관리합니다. 하단의 `DESIGNED & DEVELOPED BY HONEYWATER`는 참고 레포의 표기를 따릅니다.
+**맺는 말씀** — 제목은 `G.closing.label`, 제작자 문구는 `G.closing.credit`에서 관리합니다. 마지막 섹션 하단 24px 위에 저작권과 `DESIGNED & DEVELOPED BY HONEYWATER`를 함께 표시합니다. 공유 버튼 공간을 양옆에 확보하며, 좁은 화면에서는 문구가 줄바꿈됩니다. 제작자 문구는 참고 레포의 표기를 따릅니다.
 
 ---
 
