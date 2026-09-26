@@ -47,8 +47,9 @@ export function connectVideoQuality(
     pending = { playback: { ...playback }, positioned: false };
     selected = target;
     video.dataset.videoQuality = target === full ? 'hd' : 'preview';
-    // 선택한 영상은 일시정지 상태의 화질 전환에서도 첫 프레임을 읽을 수 있어야 한다.
-    video.preload = 'metadata';
+    // 화질 전환은 load()로 일시정지된다. metadata만 받으면 첫 프레임 대기와
+    // 다운로드 중단이 서로를 기다리므로, 선택한 영상은 재생 버퍼까지 확보한다.
+    video.preload = 'auto';
     video.src = target;
     video.load();
     if (target === full) {
@@ -103,6 +104,7 @@ export function connectVideoQuality(
       // 소스 재교체의 AbortError나 브라우저 자동재생 제한은 오류 화면으로 바꾸지 않는다.
       void video.play().catch(() => {});
     } else {
+      video.preload = 'metadata';
       video.pause();
     }
   };
@@ -145,8 +147,13 @@ export function connectVideoQuality(
   const visibilityChanged = () => { if (doc.visibilityState === 'hidden') suspend(); };
   const pause = () => {
     if (video.paused && pending && pending.positioned && video.readyState >= 2) pending.playback.playing = false;
+    if (video.paused && !pending && selected) video.preload = 'metadata';
   };
-  const play = () => { if (!video.paused && pending) pending.playback.playing = true; };
+  const play = () => {
+    if (video.paused) return;
+    if (selected) video.preload = 'auto';
+    if (pending) pending.playback.playing = true;
+  };
   const settingsChanged = () => {
     if (!pending || !pending.positioned) return;
     pending.playback.rate = video.playbackRate;

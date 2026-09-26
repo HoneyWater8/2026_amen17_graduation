@@ -1,0 +1,19 @@
+{
+  "name": "amen17-graduation-videos",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-09-26",
+  "account_id": "f59ada602e45f4585fa7fca0becf52e7",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "R2_ACCOUNT_ID": "f59ada602e45f4585fa7fca0becf52e7",
+    "R2_BUCKET": "amen17-graduation-videos"
+  },
+  "r2_buckets": [
+    {
+      "binding": "VIDEOS",
+      "bucket_name": "amen17-graduation-videos"
+    }
+  ],
+  "observability": { "enabled": false }
+}

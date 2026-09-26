@@ -315,11 +315,11 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 | 방식 | 방법 | 적합한 경우 |
 |---|---|---|
 | 로컬 파일 | `FE/public/video/` 아래에 두고 해당 초원의 URL을 `/video/파일명.mp4`로 지정 | 로컬 확인 (`public/video/*`는 git 제외) |
-| **Vercel Blob (현재 배포 방식)** | 영상 업로드 후 Production/Preview 환경 변수에 공개 주소 지정 | 배포용 영상 |
+| **Cloudflare R2 + Worker** | 영상 업로드 후 Production/Preview 환경 변수에 공개 주소 지정 | 배포용 영상. 기존 졸업 사이트 주소 유지 |
 
-재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. **2026-09-26 새 간증 10편의 경량본을 Vercel Blob에 업로드하고 Production/Preview URL을 등록·교체했습니다. 감사 합본은 기존 주소를 유지합니다.** 기존 환경 변수를 유지하면 이후 Git 배포에서도 영상이 연결됩니다. 영상 교체 시에는 새 파일 업로드 → 환경 변수 URL 변경 → `main` 커밋·푸시를 통한 자동 배포 순서로 반영합니다. 공개 경로와 절차는 [영상 자산 관리](./docs/video-assets.md#공개-배포-vercel-blob)를 참고하세요. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
+재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. **2026-09-27 Cloudflare R2로 영상 호스팅을 이전합니다.** 간증 10편·감사 합본의 경량본과 고화질본은 Cloudflare에서 직접 전송하고 웹앱·이미지는 기존 Vercel 사이트에서 제공합니다. 영상 교체는 새 파일 업로드 → 공개 URL 검증 → 환경 변수 변경 → `main` 커밋·푸시를 통한 자동 배포 순서로 반영합니다. 현재 반영 단계·설정·무료 한도는 [Cloudflare R2 운영 문서](./docs/cloudflare-r2.md)를 참고하세요. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
 
-**졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 Vercel Blob 경량본을 재생하고 전체화면에서는 `VITE_GRADUATION_VIDEO_FULL_URL`로 전환합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/{preview,hd}.mp4`를 사용합니다.
+**졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 경량본을 재생하고 전체화면에서는 `VITE_GRADUATION_VIDEO_FULL_URL`로 전환합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/{preview,hd}.mp4`를 사용합니다.
 
 **맺는 말씀** — 제목은 `G.closing.label`, 제작자 문구는 `G.closing.credit`에서 관리합니다. 마지막 섹션 하단 24px 위에 저작권과 `DESIGNED & DEVELOPED BY HONEYWATER`를 함께 표시합니다. 공유 버튼 공간을 양옆에 확보하며, 좁은 화면에서는 문구가 줄바꿈됩니다. 제작자 문구는 참고 레포의 표기를 따릅니다.
 

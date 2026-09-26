@@ -3,6 +3,7 @@
    ───────────────────────────────────────────────────────── */
 
 import { useEffect, useRef, useState } from 'react';
+import { preconnect } from 'react-dom';
 import { EV, FF } from '../../theme/tokens';
 import type { GradVideo } from '../../data/types';
 import { track } from '../../utils/analytics';
@@ -53,6 +54,15 @@ export function VideoSlot({
   const showVideo = Boolean(video.src) && !failed;
   useEffect(() => {
     if (!player.current || failed || !video.src) return;
+    // 파일은 클릭 뒤에만 요청하되 서버 연결은 미리 준비해 첫 재생의 연결 대기를 줄인다.
+    // React가 같은 서버의 힌트를 합치므로 11개 슬롯이 별도 연결을 만들지 않는다.
+    for (const src of [video.src, video.fullSrc]) {
+      if (!src) continue;
+      try {
+        const url = new URL(src, document.baseURI);
+        if (url.protocol === 'https:' && url.origin !== location.origin) preconnect(url.origin);
+      } catch { /* 잘못된 영상 주소는 기존 플레이어의 오류 처리에 맡긴다. */ }
+    }
     const connected = connectVideoQuality(
       player.current, { src: video.src, fullSrc: video.fullSrc },
       () => setFailed(true), () => setActive(false),

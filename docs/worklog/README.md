@@ -31,6 +31,9 @@
 | 2026-09-26 | [마지막 섹션 푸터 하단 배치](./2026-09-26-closing-footer-bottom.md) |
 | 2026-09-26 | [Pro 전환 후 실배포 상태 점검](./2026-09-26-pro-upgrade-status.md) |
 | 2026-09-26 | [재생 전 영상 요청 제거와 다운로드 중단·이어보기](./2026-09-26-video-bandwidth.md) |
+| 2026-09-26 | [Pro 취소 후 Hobby 전환과 영상 차단 확인](./2026-09-26-cancellation-status.md) |
+| 2026-09-27 | [Cloudflare R2 영상 이전과 읽기 전용 Worker](./2026-09-27-cloudflare-r2.md) |
+| 2026-09-27 | [영상 버퍼 확보와 R2 직접 전송으로 반복 로딩 개선](./2026-09-27-video-buffering.md) |
 
 ## 작성 규칙
 

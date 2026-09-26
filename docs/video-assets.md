@@ -1,6 +1,8 @@
 # 영상 자산 관리
 
-2026-09-26 기준. 초원 이름과 순서는 사용자가 전달한 정본을 따른다. **새 초원별 간증 영상 10편의 원본 정리·재생용 변환·Vercel Blob 공개 업로드 완료. 간증 10편과 감사 합본 1편을 연결한다.**
+2026-09-27 기준. 초원 이름과 순서는 사용자가 전달한 정본을 따른다. **간증 10편과 감사 합본 1편의 경량본·고화질본을 Cloudflare R2로 이전한다.** 원본 정리·재생용 변환은 완료됐으며 이번 이전에서는 영상을 재변환하지 않는다.
+
+**이전 배경:** 2026-09-26 Pro 취소로 Hobby 전환이 즉시 적용돼 기존 Blob 영상 22개가 `403 Your store is blocked` 상태가 됐다. 사이트·썸네일은 정상이었다. [취소 후 점검 기록](./worklog/2026-09-26-cancellation-status.md). R2 전환의 현재 상태와 절차는 [Cloudflare 운영 문서](./cloudflare-r2.md)를 따른다. 기존 졸업 사이트 주소는 유지한다.
 
 ## 디렉터리
 
@@ -40,9 +42,17 @@ FE/public/video-posters/             # 별도 WebP 썸네일. Git에 포함해 �
 └─ graduation.webp
 ```
 
-`public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않는다. 현재 연결된 배포용 경량본 11개는 Vercel Blob에 올렸으며, Git 빌드는 환경 변수의 공개 URL로 연결한다.
+`public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않는다. Git 빌드는 환경 변수의 공개 URL로 영상을 연결한다.
+
+## 공개 배포 (Cloudflare R2)
+
+`amen17-graduation-videos` 버킷(APAC, Standard)의 경량본 11개·고화질본 11개를 읽기 전용 Worker 주소로 제공한다. 파일 합계는 953,071,937B다. 공개 주소 기준은 `https://amen17-graduation-videos.2026-amen17-graduation.workers.dev/`이며, 기존과 동일한 해시 파일 경로를 사용한다. 버킷은 비공개 상태로 두고 Worker가 GET 전용 임시 주소를 발급한다. 영상 본문은 R2에서 직접 전송하며 HEAD만 바인딩으로 처리한다.
+
+업로드: `python scripts/upload-r2-videos.py --upload`. 검증: `python scripts/verify-r2-videos.py --base-url https://amen17-graduation-videos.2026-amen17-graduation.workers.dev`. 모든 검증을 통과하면 생성되는 `assets/video-work/r2-deployment.json`의 22개 공개 주소를 Production/Preview에 등록한다. 웹앱 반영은 main push 자동 배포를 따른다. 자세한 설정·현재 반영 상태·요금 한도는 [Cloudflare R2 영상 운영](./cloudflare-r2.md)을 참고한다.
 
 ## 공개 배포 (Vercel Blob)
+
+**이 절은 2026-09-26까지 사용한 저장소와 복구용 경로 기록이다. 새 영상 업로드·교체는 위 R2 절차를 사용한다.** 기존 Blob 파일은 삭제하지 않는다.
 
 **2026-09-22 최초 공개 업로드 후, 2026-09-26 사용자 요청으로 새 간증 10편의 경량본을 추가 업로드하고 Production/Preview URL을 등록·교체했다. 감사 합본 1편은 기존 주소를 유지한다.** 페이지와 영상 모두 Vercel에서 제공한다. 기존 Git 배포에서 영상 경로가 404였던 원인은 `FE/public/video/`의 파일이 Git 제외 대상이라 원격 빌드에 없었기 때문이다.
 
@@ -80,6 +90,7 @@ FE/public/video-posters/             # 별도 WebP 썸네일. Git에 포함해 �
 
 - 재생 전에는 `FE/public/video-posters/`의 640×360 WebP만 표시한다. 11장 합계 163,112 B이며 Vercel Blob에 추가 업로드하지 않고 Git으로 사이트에 포함한다.
 - 단순히 `preload="none"`에 의존하지 않는다. 초기에는 `<video>`의 `src` 자체가 없으므로 봉투를 열거나 스크롤하는 것만으로 MP4를 요청하지 않는다. 클릭한 영상에만 경량본을 연결한다.
+- 클릭한 영상과 화질 전환 중에는 `preload="auto"`로 실제 재생 버퍼를 확보한다. 일시정지 뒤에는 metadata로 줄인다. 영상 서버에는 preconnect 힌트만 미리 전달하며 파일은 받지 않는다. Worker는 GET 전용 임시 주소만 발급하고 영상 본문은 R2에서 직접 받는다. 설정과 성능 검증은 [R2 운영 문서](./cloudflare-r2.md)를 따른다.
 - 탭으로 돌아온 것만으로 영상을 다시 요청하지 않는다. 재생 버튼을 눌러야 이어 본다. 재생 위치는 현재 페이지 메모리에만 유지하며 새로고침 후에는 초기화한다.
 - 전체화면 고화질과 오류 복귀는 유지한다. 영상 해상도·비트레이트는 이번 최적화에서 바꾸지 않았다. 실제 시청에 필요한 전송량과 화질 전환에 따른 재요청은 계속 발생하며, 클라이언트 코드만으로 월 무료 한도나 1년 운영을 보장하지는 않는다.
 - 영상 교체 후 `python scripts/prepare-videos.py --section posters`를 실행해 썸네일도 갱신한다. `preview.mp4`의 1초 지점에서 품질 75의 WebP를 추출하며 원본·MP4는 수정하지 않는다. 환경 변수 `VITE_*_VIDEO_POSTER`로 다른 이미지를 지정할 수도 있다.
@@ -95,7 +106,7 @@ FE/public/video-posters/             # 별도 WebP 썸네일. Git에 포함해 �
 
 CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 59.25.0의 저장소 연결은 `VERCEL_OIDC_TOKEN`과 `BLOB_READ_WRITE_TOKEN`을 내려주지만 `BLOB_STORE_ID`는 빠져 있었다. 인증 만료로 접근 거절이 발생하면 `vercel env pull .env.local --yes`로 갱신한다. 2026-09-26 CLI 60.0.1에서 갱신 후 업로드를 확인했다. 두 OIDC 값이 모두 필요하다는 오류가 나면 `.env.local`에 `BLOB_STORE_ID="store_zw4d65fKlIme6aVE"`를 함께 지정한다. 인증 토큰은 문서·Git·프론트엔드 번들에 넣지 않으며 `VITE_` 접두사도 붙이지 않는다. `vercel env pull` 등이 `.gitignore` 끝에 `.env*`를 추가하면 기존 `!.env.example` 예외가 유지되도록 중복 줄을 제거한다.
 
-2026-09-26 영상 전송 한도 초과 후 사용자가 긴급 복구를 위해 Pro로 변경했다. 향후 유료 결제를 취소할 계획이며 기존 링크는 최소 1년 유지해야 한다. 호스팅 이전은 아직 결정하지 않았고, 먼저 코드에서 불필요한 영상 요청을 줄인다. 저장 용량과 월 전송량은 별개이므로 현재 요금제·사용량은 [배포 메모리](./memory/vercel-deploy-setup.md)와 대시보드에서 확인한다. [Vercel Blob 사용량·요금](https://vercel.com/docs/vercel-blob/usage-and-pricing)
+2026-09-26 영상 전송 한도 초과 후 사용자가 긴급 복구를 위해 Pro로 변경했다가 같은 날 취소했다. Hobby 전환 후 영상 저장소가 다시 차단됐다. 기존 링크는 최소 1년 유지해야 하며 호스팅 이전 대상은 아직 결정하지 않았다. 코드의 불필요한 요청은 줄였지만 과거 누적 사용량을 초기화하거나 저장소 차단을 해제하지는 못한다. 현재 요금제·사용량은 [배포 메모리](./memory/vercel-deploy-setup.md)와 대시보드에서 확인한다. [Vercel Blob 사용량·요금](https://vercel.com/docs/vercel-blob/usage-and-pricing)
 
 ## 전체화면 고화질
 
@@ -109,7 +120,7 @@ CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 5
 
 `hd.mp4`는 `full.mp4`를 H.264 CRF 24 / medium으로 다시 압축한 공개 전송용 파일이다. 해상도·프레임률·AAC 음성을 유지하며, 원본 비트스트림과 동일하지는 않다. 기존 원본·`full.mp4`는 그대로 보존한다.
 
-고화질 업로드 합계 731,514,520 B(697.63 MiB). 기존 경량본·이전 간증 4개까지 포함한 Blob 전체는 989,065,457 B(943.25 MiB), 총 26개다. 업로드 당시 Hobby 저장 공간 포함량 1GB 안에 맞춘 결과이며, 이후 사용자가 Pro로 변경했다. Hobby로 돌아가면 저장 공간 여유는 약 10.9MB이므로 추가 업로드 전에 용량을 확인한다. 월 전송량은 별도로 사용량을 확인한다.
+고화질 업로드 합계 731,514,520 B(697.63 MiB). 기존 경량본·이전 간증 4개까지 포함한 Blob 전체는 989,065,457 B(943.25 MiB), 총 26개다. 업로드 당시 Hobby 저장 공간 포함량 1GB 안에 맞춘 결과다. 현재 Hobby 기준 저장 공간 여유는 약 10.9MB이므로 추가 업로드 전에 용량을 확인한다. 월 전송량과 저장소 차단 상태는 별도로 확인한다.
 
 | 영상 | 해상도 | hd.mp4 | 공개 경로 |
 |---|---|---|---|

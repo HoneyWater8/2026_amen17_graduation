@@ -56,6 +56,7 @@ test('고화질은 전체화면에서만 요청하고 재생 위치·속도·음
   assert.deepEqual(v.loads, []);
   f.fullscreen(true);
   assert.match(v.src, /hd.mp4$/);
+  assert.equal(v.preload, 'auto', '전환 중에는 재생 데이터까지 받아야 한다');
   f.loaded();
   assert.equal(v.currentTime, 42); assert.equal(v.paused, false);
   assert.equal(v.playbackRate, 1.5); assert.equal(v.volume, 0.4); assert.equal(v.muted, true);
@@ -69,6 +70,7 @@ test('일시정지 상태 및 영상 끝 위치를 유지', t => {
   v.paused = true; v.currentTime = 120; v.ended = true;
   f.fullscreen(true); f.loaded();
   assert.equal(v.currentTime, 120); assert.equal(v.paused, true);
+  assert.equal(v.preload, 'metadata', '일시정지한 영상은 프레임 복원 뒤 선로딩을 줄인다');
 });
 
 test('고화질 로딩 중 빠른 진입·종료·재진입에서도 0초로 돌아가지 않음', t => {
@@ -180,7 +182,7 @@ test('첫 클릭은 경량본만 연결하고 같은 클릭 안에서 play를 �
   f.start();
   assert.deepEqual(f.video.loads, ['https://site.test/preview.mp4']);
   assert.equal(f.video.paused, false);
-  assert.equal(f.video.preload, 'metadata');
+  assert.equal(f.video.preload, 'auto');
   f.loaded();
   assert.equal(f.video.currentTime, 0); assert.equal(f.video.paused, false);
 });

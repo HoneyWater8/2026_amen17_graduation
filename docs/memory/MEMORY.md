@@ -11,7 +11,7 @@
 - [자산 파이프라인](./asset-pipeline.md) — 새 간증 10편 변환·공개 배포(2026-09-26) · 이전 간증 4편 별도 보존 · 영상 원본 21개·재생본 33개 · WebP 썸네일은 Git 포함 · 추가 졸업 사진·모바일 실기기 확인
 - [사용자 집계 설정](./analytics-setup.md) — Vercel+GA4 두 축. GA4는 HTML 스니펫으로 초기화. **2026-10 중순 전에 Vercel 대시보드 캡처 필요**
 - [카카오 앱 설정](./kakao-app-setup.md) — 도메인은 「제품 링크 관리」에 등록. 플랫폼>Web 아님
-- [Vercel 배포 설정](./vercel-deploy-setup.md) — main 자동 배포 · 직접 배포 명령 사용 안 함 · Pro는 임시 복구 조치 · 링크 최소 1년 유지 · 호스팅 이전 미정
+- [Vercel 배포 설정](./vercel-deploy-setup.md) — main 자동 배포 · Vercel 직접 배포 명령 사용 안 함 · Pro 취소 후 Blob 차단 · 링크 최소 1년 유지 · Cloudflare R2로 영상 이전
 - [커밋·푸시는 지시받을 때만](./ask-before-commit-push.md) — push가 곧 공개 배포라 알아서 커밋하지 말 것
 - [개인 GitHub identity](./github-identity.md) — HoneyWater8 / 전역 git config는 회사 이메일이라 주의
 
