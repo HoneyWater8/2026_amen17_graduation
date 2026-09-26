@@ -7,6 +7,8 @@ import { EV, FF } from '../../theme/tokens';
 import type { GradVideo } from '../../data/types';
 import { track } from '../../utils/analytics';
 import { connectVideoQuality } from '../../utils/videoQuality';
+import type { VideoController } from '../../utils/videoQuality';
+import { G } from '../../data/graduation';
 
 type VideoSlotProps = {
   video: GradVideo;
@@ -44,11 +46,19 @@ export function VideoSlot({
   compact = false,
 }: VideoSlotProps) {
   const [failed, setFailed] = useState(false);
+  const [active, setActive] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const player = useRef<HTMLVideoElement>(null);
+  const controller = useRef<VideoController | null>(null);
   const showVideo = Boolean(video.src) && !failed;
   useEffect(() => {
     if (!player.current || failed || !video.src) return;
-    return connectVideoQuality(player.current, { src: video.src, fullSrc: video.fullSrc }, () => setFailed(true));
+    const connected = connectVideoQuality(
+      player.current, { src: video.src, fullSrc: video.fullSrc },
+      () => setFailed(true), () => setActive(false),
+    );
+    controller.current = connected;
+    return () => { controller.current = null; connected.dispose(); };
   }, [video.src, video.fullSrc, failed]);
 
   return (
@@ -63,24 +73,43 @@ export function VideoSlot({
         }}
       >
         {showVideo ? (
-          <video
-            ref={player}
-            aria-label={label}
-            src={video.src}
-            poster={video.poster}
-            controls
-            playsInline
-            preload="metadata"
-            onPlay={({ currentTarget }) => {
-              // 간증과 감사 영상의 소리가 겹치지 않도록, 다른 영상은 재생 위치를 유지한 채 멈춘다.
-              currentTarget.ownerDocument.querySelectorAll<HTMLVideoElement>('[data-role="video-slot"] video')
-                .forEach((other) => {
-                  if (other !== currentTarget) other.pause();
-                });
-              track('video_play', { video: slotKey ?? 'unknown' }, true);
-            }}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-          />
+          <>
+            <video
+              ref={player}
+              aria-label={label}
+              poster={video.poster}
+              controls={active}
+              tabIndex={active ? 0 : -1}
+              playsInline
+              preload="none"
+              onPlay={({ currentTarget }) => {
+                if (!currentTarget.paused) track('video_play', { video: slotKey ?? 'unknown' }, true);
+              }}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+            />
+            {!active && (
+              <button
+                type="button"
+                aria-label={`${label ?? ''} ${hasStarted ? G.videoUi.resume : G.videoUi.play}`.trim()}
+                onClick={() => {
+                  setActive(true);
+                  setHasStarted(true);
+                  controller.current?.start();
+                  player.current?.focus();
+                }}
+                style={{
+                  position: 'absolute', inset: 0, width: '100%', height: '100%',
+                  border: 0, padding: 0, cursor: 'pointer', color: EV.paper,
+                  background: 'rgba(0,0,0,.12)', display: 'grid', placeItems: 'center',
+                }}
+              >
+                <svg width={Math.max(36, iconSize)} height={Math.max(36, iconSize)} viewBox="0 0 46 46" aria-hidden="true">
+                  <circle cx="23" cy="23" r="22" fill="rgba(0,0,0,.55)" stroke="currentColor" />
+                  <path d="M18 14 L33 23 L18 32 Z" fill="currentColor" />
+                </svg>
+              </button>
+            )}
+          </>
         ) : (
           <div style={{ textAlign: 'center', padding: compact ? 8 : 18 }}>
             <svg width={iconSize} height={iconSize} viewBox="0 0 46 46" aria-hidden="true" style={{ display: 'block', margin: '0 auto' }}>

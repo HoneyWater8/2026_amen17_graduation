@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-"""영상 원본에서 경량본(preview), 보존용 고화질본(full), 웹 고화질본(hd)을 만든다.
+"""영상 원본에서 경량본(preview), 보존용 고화질본(full), 웹 고화질본(hd), 별도 썸네일을 만든다.
 
 원본은 assets/video-originals/에 보관하고, FE/public/video/에는 재생용만 쓴다.
 원본의 이동·삭제는 이 스크립트가 하지 않는다. 미수령 초원은 건너뛴다.
 
-필요 도구: PATH의 ffmpeg, ffprobe (libx264, zscale, tonemap 지원)
+필요 도구: PATH의 ffmpeg, ffprobe (libx264, libwebp, zscale, tonemap 지원)
 사용법:
     python scripts/prepare-videos.py --section testimony
     python scripts/prepare-videos.py --section graduation
     python scripts/prepare-videos.py --section all
     python scripts/prepare-videos.py --section hd
     python scripts/prepare-videos.py --section hd --hd-section graduation
+    python scripts/prepare-videos.py --section posters
 
 감사 합본은 NN-그룹.mp4 파일명의 앞 번호순으로 자르지 않고 연결한다.
 원본 해시·변환 인자가 같은 완료 파일은 재사용한다. 검증 전 결과는 public에 노출하지 않는다.
@@ -29,6 +30,7 @@ import sys
 REPO = Path(__file__).resolve().parent.parent
 ORIGINALS = REPO / 'assets/video-originals'
 OUTPUT = REPO / 'FE/public/video'
+POSTERS = REPO / 'FE/public/video-posters'
 WORK = REPO / 'assets/video-work'
 PREVIEW_SIZE = (960, 540)
 # 2336×1080 가로 영상도 잘라내거나 줄이지 않도록 이를 담는 16:9 표준 크기를 쓴다.
@@ -263,9 +265,58 @@ def high_definition(section='all'):
     return reports
 
 
+def posters():
+    # 재생 전에는 MP4 메타데이터조차 요청하지 않도록 별도 이미지를 Git 배포에 포함한다.
+    reports = []
+    sources = [OUTPUT / 'testimony' / f'{number:02d}' / 'preview.mp4' for number, _ in TESTIMONY]
+    sources.append(OUTPUT / 'graduation/preview.mp4')
+    for source in sources:
+        if not source.is_file():
+            raise FileNotFoundError(f'썸네일을 만들 경량본이 없습니다: {source}')
+        relative = source.parent.relative_to(OUTPUT).with_suffix('.webp')
+        path = POSTERS / relative
+        job = 'poster-' + '-'.join(relative.with_suffix('').parts)
+        state_path = WORK / f'{job}.json'
+        args = [
+            '-ss', '1', '-i', str(source), '-frames:v', '1', '-an',
+            '-vf', 'scale=640:360:force_original_aspect_ratio=decrease:flags=lanczos,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1',
+            '-c:v', 'libwebp', '-quality', '75', '-compression_level', '6',
+            '-map_metadata', '-1',
+        ]
+        signature = hashlib.sha256(json.dumps({
+            'args': args, 'source': sha256(source),
+        }).encode('utf-8')).hexdigest()
+        previous = json.loads(state_path.read_text('utf-8')) if state_path.exists() else None
+        if path.exists() and previous and previous['signature'] == signature and previous['sha256'] == sha256(path):
+            reports.append(previous['result'])
+            print(f'SKIP {path.relative_to(REPO)}', flush=True)
+            continue
+        temporary = WORK / f'{job}.partial.webp'
+        subprocess.run([
+            'ffmpeg', '-hide_banner', '-loglevel', 'error', '-nostdin', '-y',
+            '-threads', '2', '-filter_threads', '2', *args, str(temporary),
+        ], check=True)
+        stream = video_stream(probe(temporary))
+        if stream['codec_name'] != 'webp' or (stream['width'], stream['height']) != (640, 360):
+            raise ValueError(f'썸네일 규격 불일치: {temporary}')
+        # 새 체크아웃에 이미 있는 이미지가 동일한 결과면 허용하되, 수동 교체한 이미지는 덮어쓰지 않는다.
+        if path.exists() and sha256(path) != sha256(temporary) and (not previous or previous['sha256'] != sha256(path)):
+            raise FileExistsError(f'수동 변경한 썸네일을 확인하세요: {path}')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary.replace(path)
+        report = {'path': path.relative_to(REPO).as_posix(), 'bytes': path.stat().st_size, 'width': 640, 'height': 360}
+        state_path.write_text(json.dumps({
+            'signature': signature, 'sha256': sha256(path), 'result': report,
+            'source': source.relative_to(REPO).as_posix(),
+        }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        reports.append(report)
+        print(f"DONE {report['path']} ({report['bytes']} bytes)", flush=True)
+    return reports
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--section', choices=['testimony', 'graduation', 'all', 'hd'], default='all')
+    parser.add_argument('--section', choices=['testimony', 'graduation', 'all', 'hd', 'posters'], default='all')
     parser.add_argument('--hd-section', choices=['testimony', 'graduation', 'all'], default='all')
     args = parser.parse_args()
     WORK.mkdir(parents=True, exist_ok=True)
@@ -276,6 +327,8 @@ def main():
         reports += graduation()
     if args.section in ('hd', 'all'):
         reports += high_definition(args.hd_section if args.section == 'hd' else 'all')
+    if args.section in ('posters', 'all'):
+        reports += posters()
     report_name = f'hd-{args.hd_section}' if args.section == 'hd' and args.hd_section != 'all' else args.section
     (WORK / f'report-{report_name}.json').write_text(json.dumps(reports, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'완료: 재생용 파일 {len(reports)}개', flush=True)

@@ -37,7 +37,7 @@ export type GradVideo = {
   src: string;
   /** 전체화면용 고화질 URL. 생략하면 전체화면에서도 src를 유지한다. */
   fullSrc?: string;
-  /** 첫 프레임 포스터 이미지 — 없으면 검은 배경 */
+  /** 재생 전 표시할 별도 포스터 이미지 — 영상 요청 없이 표시한다 */
   poster?: string;
   dur: string;
   /** 영상 위에 표시할 설명. 사진 등 항목 전체의 설명과 구분한다 */
@@ -87,6 +87,7 @@ export type GradClosing = {
 };
 
 export type GraduationData = {
+  videoUi: { play: string; resume: string };
   meta: GradMeta;
   when: GradWhen;
   where: GradWhere;

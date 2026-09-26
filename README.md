@@ -88,6 +88,7 @@
 │   │   ├── seal/wax-seal.png           # 왁스 씰 (360×300, 73KB)
 │   │   ├── journey/<slug>/             # 여정 사진 — thumb(320w) · full(1280w) 2벌
 │   │   ├── video/                      # 재생용 영상 — testimony/NN/ · graduation/ (git 제외)
+│   │   ├── video-posters/              # 재생 전 표시할 WebP 썸네일 11장 (Git 포함)
 │   │   └── icons/                      # thumbnail(공유 카드) · favicon · apple-touch-icon
 │   ├── src/
 │   │   ├── App.tsx                     # 봉투 stage + 2레이어 조립
@@ -148,7 +149,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # tsc -b && vite build
 npm run lint
-npm test           # 전체화면 전환·오류 복귀·단일 재생 경합 (Node.js 22.18+)
+npm test           # 지연 로딩·중단/재개·전체화면 전환·오류 복귀 (Node.js 22.18+)
 ```
 
 ---
@@ -197,7 +198,8 @@ git push origin main      # → Vercel이 자동 빌드·배포
 | `VITE_TESTIMONY_1_VIDEO_URL` ~ `VITE_TESTIMONY_10_VIDEO_URL` | 초원별 졸업 간증 영상 (§02) | 01~10 모두 로컬 경량본 사용. 로드 실패 시 준비 안내 |
 | `VITE_TESTIMONY_1_VIDEO_FULL_URL` ~ `VITE_TESTIMONY_10_VIDEO_FULL_URL` | 초원별 전체화면 고화질 영상 | 로컬 `hd.mp4`. 원격 경량본만 설정한 경우 경량본 유지 |
 | `VITE_GRADUATION_VIDEO_FULL_URL` | 감사 합본 전체화면 고화질 영상 | 로컬 `hd.mp4`. 원격 경량본만 설정한 경우 경량본 유지 |
-| `VITE_TESTIMONY_1_VIDEO_POSTER` ~ `VITE_TESTIMONY_10_VIDEO_POSTER` | 초원별 영상 포스터 (선택) | 검은 배경 |
+| `VITE_TESTIMONY_1_VIDEO_POSTER` ~ `VITE_TESTIMONY_10_VIDEO_POSTER` | 초원별 영상 포스터 재정의 (선택) | `/video-posters/testimony/NN.webp` |
+| `VITE_GRADUATION_VIDEO_POSTER` | 감사 합본 포스터 재정의 (선택) | `/video-posters/graduation.webp` |
 | `VITE_GRADUATION_VIDEO_URL` | 졸업 예배 감사 영상 (§03 여정 마지막) | `/video/graduation/preview.mp4` 사용. 파일이 없으면 준비 안내 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
 
@@ -298,7 +300,9 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 
 **졸업 간증 영상** — `G.testimony.groups`에 10개 초원이 등록되어 있습니다. `testimonyOf()`의 두 번째 인자는 표시명이며, 배열 순서대로 왼쪽부터 배치합니다. 첫 번째 인자는 재생 집계용 고정 번호이므로 초원명을 바꾸어도 유지합니다.
 
-**영상은 한 번에 하나만 재생합니다.** 간증·감사 영상을 구분하지 않고 새 영상을 재생하면 다른 영상은 자동으로 일시정지합니다. 멈춘 위치는 유지되어 다시 누르면 이어서 재생합니다.
+**영상은 재생 버튼을 누를 때만 불러오며 한 번에 하나만 재생합니다.** 재생 전에는 WebP 썸네일을 표시하고 MP4 주소를 연결하지 않습니다. 간증·감사 영상을 구분하지 않고 다른 영상을 재생하거나 탭을 숨기거나 페이지를 떠나면 기존 영상의 주소를 해제해 다운로드를 중단합니다. 같은 페이지에서 다시 재생 버튼을 누르면 멈춘 위치·속도·음량·음소거를 복원합니다. 화면에 돌아오기만 해서는 자동 재생하지 않으며, 새로고침 후 위치는 저장하지 않습니다.
+
+썸네일은 `FE/public/video-posters/`에 Git으로 배포합니다(11장 합계 163,112 B). 영상을 교체하면 `python scripts/prepare-videos.py --section posters`로 썸네일도 갱신합니다. 이 최적화는 시청하지 않는 영상의 전송을 줄이며, 실제 재생·고화질 전환에 필요한 전송량은 발생합니다.
 
 영상 원본은 `assets/video-originals/`에 보존하고, `scripts/prepare-videos.py`로 경량본 `preview.mp4`, 보존용 고화질본 `full.mp4`, 전체화면 배포용 `hd.mp4`를 만듭니다. `hd.mp4`는 `full.mp4`의 해상도·프레임률을 유지하면서 웹 전송용으로 재압축합니다. 초원별 수령 현황·파일 경로·감사 통합본 순서·재생성 방법은 [영상 자산 관리](./docs/video-assets.md)를 참고하세요.
 

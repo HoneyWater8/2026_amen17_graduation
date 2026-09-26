@@ -15,14 +15,14 @@ function testimonyOf(number: number, name: string, src?: string, poster?: string
       src: src || `/video/testimony/${String(number).padStart(2, '0')}/preview.mp4`,
       // 원격 경량본만 등록한 환경에서는 없는 로컬 고화질 주소를 요청하지 않는다.
       fullSrc: fullSrc || (!src ? `/video/testimony/${String(number).padStart(2, '0')}/hd.mp4` : undefined),
-      poster: poster || undefined, dur: '', note: '준비중 입니다',
+      poster: poster || `/video-posters/testimony/${String(number).padStart(2, '0')}.webp`, dur: '', note: '준비중 입니다',
     },
   };
 }
 
 /** 03 여정 · 졸업 예배 — 공개 URL이 없으면 로컬 감사 통합본을 사용한다. */
 const GRADUATION_SRC = import.meta.env.VITE_GRADUATION_VIDEO_URL || '/video/graduation/preview.mp4';
-const GRADUATION_POSTER = import.meta.env.VITE_GRADUATION_VIDEO_POSTER || undefined;
+const GRADUATION_POSTER = import.meta.env.VITE_GRADUATION_VIDEO_POSTER || '/video-posters/graduation.webp';
 
 /**
  * 시기별 사진 경로 생성.
@@ -43,6 +43,7 @@ function photosOf(slug: string, count: number, label: string): JourneyPhoto[] {
 }
 
 export const G: GraduationData = {
+  videoUi: { play: '영상 재생', resume: '영상 이어보기' },
   meta: {
     org: "하나로교회",
     cohort: "아멘 제자 17기",
