@@ -1,3 +1,7 @@
+/* ─────────────────────────────────────────────────────────
+   맺는 말씀 · 성경 본문과 제작자 표기
+   ───────────────────────────────────────────────────────── */
+
 import { EV, FF } from '../../theme/tokens';
 import { Section } from '../common/Section';
 import { SectionHead } from '../common/SectionHead';
@@ -8,7 +12,7 @@ import { G } from '../../data/graduation';
 type ClosingProps = { active: boolean };
 
 /**
- * 05 맺는 말 — 말씀 본문 + 출처 + 푸터.
+ * 05 맺는 말씀 — 말씀 본문 + 출처 + 푸터.
  *
  * 겹낫표는 각 줄을 inline-block 스팬으로 감싸고 그 바깥에 absolute로 붙인다.
  * 이렇게 해야 가운데 정렬에 영향을 주지 않으면서 텍스트 시작/끝에 정확히 붙는다.
@@ -17,11 +21,12 @@ export function Closing({ active }: ClosingProps) {
   const lines = G.closing.lines;
 
   return (
-    <Section label="05 Closing" bg={EV.paper} pad="52px 22px 28px">
+    // 작은 화면에서도 고정 공유 버튼이 하단 제작자 문구를 가리지 않게 공간을 둔다.
+    <Section label="05 Closing" bg={EV.paper} pad="52px 22px 92px">
       <div style={{ flex: 1 }} />
 
       <Reveal active={active}>
-        <SectionHead ko="맺는 말" en="Closing" />
+        <SectionHead ko={G.closing.label} en="Closing" />
       </Reveal>
 
       <Reveal delay={0.08} active={active}>
@@ -63,6 +68,10 @@ export function Closing({ active }: ClosingProps) {
         textAlign: 'center', fontFamily: FF.serif, fontSize: 11,
         letterSpacing: 0.5, color: EV.inkSoft, opacity: 0.85,
       }}>© {G.meta.org} · {G.meta.cohortEn} · {G.meta.year}</div>
+      <div style={{
+        marginTop: 6, textAlign: 'center', fontFamily: FF.latin, fontSize: 9,
+        letterSpacing: 1.2, lineHeight: 1.6, color: EV.inkSoft, opacity: 0.85,
+      }}>{G.closing.credit}</div>
     </Section>
   );
 }

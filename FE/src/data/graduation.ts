@@ -6,12 +6,17 @@
 
 import type { GraduationData, JourneyPhoto, TestimonyGroup } from './types';
 
-/** 초원별 경량본을 사용하며, 영상 로드 실패 시 준비 안내를 표시한다. */
-function testimonyOf(number: number, name: string, src?: string, poster?: string): TestimonyGroup {
+/** 초원별 경량본과 전체화면 고화질본을 연결한다. 원격 URL을 로컬 기본 경로보다 우선한다. */
+function testimonyOf(number: number, name: string, src?: string, poster?: string, fullSrc?: string): TestimonyGroup {
   return {
     id: `testimony-${number}`,
     name,
-    video: { src: src || '', poster: poster || undefined, dur: '', note: '준비중 입니다' },
+    video: {
+      src: src || `/video/testimony/${String(number).padStart(2, '0')}/preview.mp4`,
+      // 원격 경량본만 등록한 환경에서는 없는 로컬 고화질 주소를 요청하지 않는다.
+      fullSrc: fullSrc || (!src ? `/video/testimony/${String(number).padStart(2, '0')}/hd.mp4` : undefined),
+      poster: poster || undefined, dur: '', note: '준비중 입니다',
+    },
   };
 }
 
@@ -70,16 +75,16 @@ export const G: GraduationData = {
     title: '졸업 간증 영상',
     titleEn: 'Testimony',
     groups: [
-      testimonyOf(1, '생사위주 초원', import.meta.env.VITE_TESTIMONY_1_VIDEO_URL || '/video/testimony/01/preview.mp4', import.meta.env.VITE_TESTIMONY_1_VIDEO_POSTER),
-      testimonyOf(2, 'Onlyhim 초원', import.meta.env.VITE_TESTIMONY_2_VIDEO_URL || '/video/testimony/02/preview.mp4', import.meta.env.VITE_TESTIMONY_2_VIDEO_POSTER),
-      testimonyOf(3, '하.군.남 초원', import.meta.env.VITE_TESTIMONY_3_VIDEO_URL || '/video/testimony/03/preview.mp4', import.meta.env.VITE_TESTIMONY_3_VIDEO_POSTER),
-      testimonyOf(4, '다모인 초원', import.meta.env.VITE_TESTIMONY_4_VIDEO_URL || '/video/testimony/04/preview.mp4', import.meta.env.VITE_TESTIMONY_4_VIDEO_POSTER),
-      testimonyOf(5, '은혜둥이 팔복둥이 초원', import.meta.env.VITE_TESTIMONY_5_VIDEO_URL || '/video/testimony/05/preview.mp4', import.meta.env.VITE_TESTIMONY_5_VIDEO_POSTER),
-      testimonyOf(6, '영음 초원', import.meta.env.VITE_TESTIMONY_6_VIDEO_URL || '/video/testimony/06/preview.mp4', import.meta.env.VITE_TESTIMONY_6_VIDEO_POSTER),
-      testimonyOf(7, '감사의 언니들 초원', import.meta.env.VITE_TESTIMONY_7_VIDEO_URL || '/video/testimony/07/preview.mp4', import.meta.env.VITE_TESTIMONY_7_VIDEO_POSTER),
-      testimonyOf(8, '더드림 가조 초원', import.meta.env.VITE_TESTIMONY_8_VIDEO_URL || '/video/testimony/08/preview.mp4', import.meta.env.VITE_TESTIMONY_8_VIDEO_POSTER),
-      testimonyOf(9, '어순종팀 초원', import.meta.env.VITE_TESTIMONY_9_VIDEO_URL || '/video/testimony/09/preview.mp4', import.meta.env.VITE_TESTIMONY_9_VIDEO_POSTER),
-      testimonyOf(10, '부어부어 초원', import.meta.env.VITE_TESTIMONY_10_VIDEO_URL || '/video/testimony/10/preview.mp4', import.meta.env.VITE_TESTIMONY_10_VIDEO_POSTER),
+      testimonyOf(1, '생사위주 초원', import.meta.env.VITE_TESTIMONY_1_VIDEO_URL, import.meta.env.VITE_TESTIMONY_1_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_1_VIDEO_FULL_URL),
+      testimonyOf(2, 'Onlyhim 초원', import.meta.env.VITE_TESTIMONY_2_VIDEO_URL, import.meta.env.VITE_TESTIMONY_2_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_2_VIDEO_FULL_URL),
+      testimonyOf(3, '하.군.남 초원', import.meta.env.VITE_TESTIMONY_3_VIDEO_URL, import.meta.env.VITE_TESTIMONY_3_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_3_VIDEO_FULL_URL),
+      testimonyOf(4, '다모인 초원', import.meta.env.VITE_TESTIMONY_4_VIDEO_URL, import.meta.env.VITE_TESTIMONY_4_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_4_VIDEO_FULL_URL),
+      testimonyOf(5, '은혜둥이 팔복둥이 초원', import.meta.env.VITE_TESTIMONY_5_VIDEO_URL, import.meta.env.VITE_TESTIMONY_5_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_5_VIDEO_FULL_URL),
+      testimonyOf(6, '영음 초원', import.meta.env.VITE_TESTIMONY_6_VIDEO_URL, import.meta.env.VITE_TESTIMONY_6_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_6_VIDEO_FULL_URL),
+      testimonyOf(7, '감사의 언니들 초원', import.meta.env.VITE_TESTIMONY_7_VIDEO_URL, import.meta.env.VITE_TESTIMONY_7_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_7_VIDEO_FULL_URL),
+      testimonyOf(8, '더드림 가조 초원', import.meta.env.VITE_TESTIMONY_8_VIDEO_URL, import.meta.env.VITE_TESTIMONY_8_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_8_VIDEO_FULL_URL),
+      testimonyOf(9, '어순종팀 초원', import.meta.env.VITE_TESTIMONY_9_VIDEO_URL, import.meta.env.VITE_TESTIMONY_9_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_9_VIDEO_FULL_URL),
+      testimonyOf(10, '부어부어 초원', import.meta.env.VITE_TESTIMONY_10_VIDEO_URL, import.meta.env.VITE_TESTIMONY_10_VIDEO_POSTER, import.meta.env.VITE_TESTIMONY_10_VIDEO_FULL_URL),
     ],
   },
 
@@ -102,6 +107,7 @@ export const G: GraduationData = {
       photos: photosOf("graduation", 1, "졸업 예배"),
       video: {
         src: GRADUATION_SRC,
+        fullSrc: import.meta.env.VITE_GRADUATION_VIDEO_FULL_URL || (!import.meta.env.VITE_GRADUATION_VIDEO_URL ? '/video/graduation/hd.mp4' : undefined),
         poster: GRADUATION_POSTER,
         dur: "",
         desc: "감사 영상 · 제자들이 담임목사님께 전하는 한마디",
@@ -138,7 +144,7 @@ export const G: GraduationData = {
   ],
 
   closing: {
-    label: "맺는 말",
+    label: "맺는 말씀",
     lines: [
       "에스라가 위대하신 하나님 여호와를",
       "송축하매 모든 백성이 손을 들고",
@@ -146,6 +152,7 @@ export const G: GraduationData = {
       "몸을 굽혀 얼굴을 땅에 대고",
       "여호와께 경배하니라"
     ],
-    sign: "느헤미야 8장 6절"
+    sign: "느헤미야 8장 6절",
+    credit: "DESIGNED & DEVELOPED BY HONEYWATER"
   }
 };

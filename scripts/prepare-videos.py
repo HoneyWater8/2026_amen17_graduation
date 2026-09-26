@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""영상 원본에서 경량본(preview)과 고화질본(full)을 만든다.
+"""영상 원본에서 경량본(preview), 보존용 고화질본(full), 웹 고화질본(hd)을 만든다.
 
 원본은 assets/video-originals/에 보관하고, FE/public/video/에는 재생용만 쓴다.
 원본의 이동·삭제는 이 스크립트가 하지 않는다. 미수령 초원은 건너뛴다.
@@ -9,6 +9,8 @@
     python scripts/prepare-videos.py --section testimony
     python scripts/prepare-videos.py --section graduation
     python scripts/prepare-videos.py --section all
+    python scripts/prepare-videos.py --section hd
+    python scripts/prepare-videos.py --section hd --hd-section graduation
 
 감사 합본은 NN-그룹.mp4 파일명의 앞 번호순으로 자르지 않고 연결한다.
 원본 해시·변환 인자가 같은 완료 파일은 재사용한다. 검증 전 결과는 public에 노출하지 않는다.
@@ -239,9 +241,32 @@ def graduation():
     return reports
 
 
+def high_definition(section='all'):
+    # 원본 해상도를 보존하는 full은 그대로 두고, 공개 전송량을 줄인 hd를 따로 만든다.
+    sources = []
+    if section in ('testimony', 'all'):
+        sources += [OUTPUT / 'testimony' / f'{number:02d}' / 'full.mp4' for number, _ in TESTIMONY]
+    if section in ('graduation', 'all'):
+        sources.append(OUTPUT / 'graduation/full.mp4')
+    reports = []
+    for source in sources:
+        if not source.is_file():
+            raise FileNotFoundError(f'고화질 재생본을 먼저 생성하세요: {source}')
+        info = probe(source)
+        stream = video_stream(info)
+        dimensions = (stream['width'], stream['height'])
+        duration = float(info['format']['duration'])
+        # 크기·프레임률·AAC 음성을 유지한다. 축소하거나 원본을 덮어쓰지 않는다.
+        args = ['-threads', '2', '-i', str(source), '-map', '0:v:0', '-map', '0:a:0']
+        args += encode_options(24, audio_copy=True)
+        reports.append(render(source.with_name('hd.mp4'), args, [source], duration, dimensions))
+    return reports
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--section', choices=['testimony', 'graduation', 'all'], default='all')
+    parser.add_argument('--section', choices=['testimony', 'graduation', 'all', 'hd'], default='all')
+    parser.add_argument('--hd-section', choices=['testimony', 'graduation', 'all'], default='all')
     args = parser.parse_args()
     WORK.mkdir(parents=True, exist_ok=True)
     reports = []
@@ -249,7 +274,10 @@ def main():
         reports += testimony()
     if args.section in ('graduation', 'all'):
         reports += graduation()
-    (WORK / f'report-{args.section}.json').write_text(json.dumps(reports, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    if args.section in ('hd', 'all'):
+        reports += high_definition(args.hd_section if args.section == 'hd' else 'all')
+    report_name = f'hd-{args.hd_section}' if args.section == 'hd' and args.hd_section != 'all' else args.section
+    (WORK / f'report-{report_name}.json').write_text(json.dumps(reports, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'완료: 재생용 파일 {len(reports)}개', flush=True)
 
 

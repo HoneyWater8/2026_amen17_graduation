@@ -2,10 +2,11 @@
    영상 슬롯 · 공통 재생 화면과 준비 안내
    ───────────────────────────────────────────────────────── */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EV, FF } from '../../theme/tokens';
 import type { GradVideo } from '../../data/types';
 import { track } from '../../utils/analytics';
+import { connectVideoQuality } from '../../utils/videoQuality';
 
 type VideoSlotProps = {
   video: GradVideo;
@@ -43,7 +44,12 @@ export function VideoSlot({
   compact = false,
 }: VideoSlotProps) {
   const [failed, setFailed] = useState(false);
+  const player = useRef<HTMLVideoElement>(null);
   const showVideo = Boolean(video.src) && !failed;
+  useEffect(() => {
+    if (!player.current || failed || !video.src) return;
+    return connectVideoQuality(player.current, { src: video.src, fullSrc: video.fullSrc }, () => setFailed(true));
+  }, [video.src, video.fullSrc, failed]);
 
   return (
     <div style={{ border: `1px solid ${EV.gold}`, padding: pad, background: EV.paperDeep }}>
@@ -58,13 +64,13 @@ export function VideoSlot({
       >
         {showVideo ? (
           <video
+            ref={player}
             aria-label={label}
             src={video.src}
             poster={video.poster}
             controls
             playsInline
             preload="metadata"
-            onError={() => setFailed(true)}
             onPlay={({ currentTarget }) => {
               // 간증과 감사 영상의 소리가 겹치지 않도록, 다른 영상은 재생 위치를 유지한 채 멈춘다.
               currentTarget.ownerDocument.querySelectorAll<HTMLVideoElement>('[data-role="video-slot"] video')

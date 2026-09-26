@@ -148,6 +148,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # tsc -b && vite build
 npm run lint
+npm test           # 전체화면 전환·오류 복귀·단일 재생 경합 (Node.js 22.18+)
 ```
 
 ---
@@ -194,6 +195,8 @@ git push origin main      # → Vercel이 자동 빌드·배포
 | 변수 | 용도 | 없을 때 |
 |---|---|---|
 | `VITE_TESTIMONY_1_VIDEO_URL` ~ `VITE_TESTIMONY_10_VIDEO_URL` | 초원별 졸업 간증 영상 (§02) | 01~10 모두 로컬 경량본 사용. 로드 실패 시 준비 안내 |
+| `VITE_TESTIMONY_1_VIDEO_FULL_URL` ~ `VITE_TESTIMONY_10_VIDEO_FULL_URL` | 초원별 전체화면 고화질 영상 | 로컬 `hd.mp4`. 원격 경량본만 설정한 경우 경량본 유지 |
+| `VITE_GRADUATION_VIDEO_FULL_URL` | 감사 합본 전체화면 고화질 영상 | 로컬 `hd.mp4`. 원격 경량본만 설정한 경우 경량본 유지 |
 | `VITE_TESTIMONY_1_VIDEO_POSTER` ~ `VITE_TESTIMONY_10_VIDEO_POSTER` | 초원별 영상 포스터 (선택) | 검은 배경 |
 | `VITE_GRADUATION_VIDEO_URL` | 졸업 예배 감사 영상 (§03 여정 마지막) | `/video/graduation/preview.mp4` 사용. 파일이 없으면 준비 안내 |
 | `VITE_KAKAO_JS_KEY` | 카카오톡 공유 | `navigator.share`(네이티브 공유 시트)로 폴백 |
@@ -297,7 +300,11 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 
 **영상은 한 번에 하나만 재생합니다.** 간증·감사 영상을 구분하지 않고 새 영상을 재생하면 다른 영상은 자동으로 일시정지합니다. 멈춘 위치는 유지되어 다시 누르면 이어서 재생합니다.
 
-영상 원본은 `assets/video-originals/`에 보존하고, `scripts/prepare-videos.py`로 재생용 `preview.mp4`와 `full.mp4`를 만듭니다. 초원별 수령 현황·파일 경로·감사 통합본 순서·재생성 방법은 [영상 자산 관리](./docs/video-assets.md)를 참고하세요. 작은 화면/전체화면에 따른 화질 전환 기능은 아직 구현하지 않았습니다.
+영상 원본은 `assets/video-originals/`에 보존하고, `scripts/prepare-videos.py`로 경량본 `preview.mp4`, 보존용 고화질본 `full.mp4`, 전체화면 배포용 `hd.mp4`를 만듭니다. `hd.mp4`는 `full.mp4`의 해상도·프레임률을 유지하면서 웹 전송용으로 재압축합니다. 초원별 수령 현황·파일 경로·감사 통합본 순서·재생성 방법은 [영상 자산 관리](./docs/video-assets.md)를 참고하세요.
+
+**전체화면 화질 전환** — 간증 10편과 감사 합본 모두 평소에는 경량본을 재생하고, 영상 전체화면에 들어갈 때만 고화질본을 요청합니다. 전체화면을 닫으면 경량본으로 돌아오며 재생 위치·재생/일시정지·속도·음량·음소거를 유지합니다. 고화질 요청이 실패하거나 15초 안에 준비되지 않으면 같은 위치의 경량본으로 복귀합니다. 전환 중 다른 영상을 재생해도 이전 영상이 뒤늦게 자동 재개하지 않습니다. 브라우저 정책으로 자동 재개가 제한되면 같은 위치에서 재생 버튼으로 이어 볼 수 있습니다.
+
+고화질 URL은 `VITE_TESTIMONY_1_VIDEO_FULL_URL`~`VITE_TESTIMONY_10_VIDEO_FULL_URL`, `VITE_GRADUATION_VIDEO_FULL_URL`에 지정합니다. 원격 경량본 주소만 있고 고화질 주소가 없으면 경량본을 유지합니다. 로컬 기본 경로는 각 영상 폴더의 `hd.mp4`입니다. 표준 전체화면 이벤트와 Safari 네이티브 영상 이벤트를 처리하며, iPhone·카카오 인앱 브라우저 실기기 동작은 별도 확인 대상입니다.
 
 초원 01~10은 `/video/testimony/NN/preview.mp4`를 기본 재생 경로로 사용합니다. 초원별 공개 URL을 지정하면 그 주소를 우선합니다 (예: 초원 1은 `VITE_TESTIMONY_1_VIDEO_URL`, 자세한 설정은 `FE/.env.example`). 2026-09-25 새 수령본은 `assets/video-originals/testimony/`에 정본 초원명으로 보관했으며 이전 원본 4편은 `assets/video-originals/archive/2026-09-25/testimony/`에 보존했습니다. 현재 재생본은 새 수령본 10편 기준입니다.
 
@@ -308,14 +315,16 @@ python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jp
 
 재생에 실패하면 해당 카드에 준비 안내가 표시됩니다. **2026-09-26 새 간증 10편의 경량본을 Vercel Blob에 업로드하고 Production/Preview URL을 등록·교체했습니다. 감사 합본은 기존 주소를 유지합니다.** 기존 환경 변수를 유지하면 이후 Git 배포에서도 영상이 연결됩니다. 영상 교체 시에는 새 파일 업로드 → 환경 변수 URL 변경 → `main` 커밋·푸시를 통한 자동 배포 순서로 반영합니다. 공개 경로와 절차는 [영상 자산 관리](./docs/video-assets.md#공개-배포-vercel-blob)를 참고하세요. 기존 단일 영상 변수 `VITE_TESTIMONY_VIDEO_URL`과 `/video/testimony.mp4` 자동 연결은 사용하지 않습니다.
 
-**졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 Vercel Blob 경량본을 재생합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/preview.mp4`를 사용합니다. 고화질본 업로드와 전체화면 화질 전환은 후속 작업입니다.
+**졸업 예배 감사 영상** — 사진 캐러셀 아래에서 `VITE_GRADUATION_VIDEO_URL`의 Vercel Blob 경량본을 재생하고 전체화면에서는 `VITE_GRADUATION_VIDEO_FULL_URL`로 전환합니다. 환경 변수가 없는 로컬 환경에서는 `/video/graduation/{preview,hd}.mp4`를 사용합니다.
+
+**맺는 말씀** — 제목은 `G.closing.label`, 제작자 문구는 `G.closing.credit`에서 관리합니다. 하단의 `DESIGNED & DEVELOPED BY HONEYWATER`는 참고 레포의 표기를 따릅니다.
 
 ---
 
 ## 디자인 토큰 (`FE/src/theme/tokens.ts`)
 
 ```ts
-EV.paper     = '#FBF7EE'   // 기본 배경 (표지·여정·맺는 말)
+EV.paper     = '#FBF7EE'   // 기본 배경 (표지·여정·맺는 말씀)
 EV.paperDeep = '#F2EADA'   // 교차 배경 (영상·명단), 사진 카드
 EV.envel     = '#EDE2CB'   // 봉투 본체
 EV.envelDk   = '#DFD0B2'   // 봉투 접힘·테두리
@@ -392,7 +401,7 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [x] 간증 영상 10편 전부 수령·원본 정리 — 2026-09-25 새 수령본 기준, 이전 4편 보존
 - [x] 2026-09-25 새 간증 10편의 재생본 변환·공개 URL 등록·교체 — 2026-09-26
 - [x] 졸업 간증 영상 공개 URL 업로드 — 2026-09-22 수령한 02·08·09·10의 Vercel Blob 경량본 배포
-- [ ] 작은 화면에서는 경량본, 전체화면에서는 고화질본으로 재생 위치를 유지하며 전환
+- [x] 작은 화면에서는 경량본, 전체화면에서는 고화질본으로 재생 위치를 유지하며 전환 — 2026-09-26 구현
 - [x] ~~카카오 공유용 `thumbnail.png` 제작~~ — 1200×630, 2026-09-11
 - [x] ~~`VITE_KAKAO_JS_KEY` 발급 + 도메인 등록~~ — 2026-09-11 완료
 - [ ] `public/icons/kakaotalk.png` (20×20 이상) — 없으면 인라인 SVG 말풍선으로 폴백

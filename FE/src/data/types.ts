@@ -35,6 +35,8 @@ export type GradVideo = {
    * 비어 있거나 재생에 실패하면 VideoSlot이 placeholder로 자동 폴백한다.
    */
   src: string;
+  /** 전체화면용 고화질 URL. 생략하면 전체화면에서도 src를 유지한다. */
+  fullSrc?: string;
   /** 첫 프레임 포스터 이미지 — 없으면 검은 배경 */
   poster?: string;
   dur: string;
@@ -81,6 +83,7 @@ export type GradClosing = {
   /** 겹낫표는 첫 줄 앞 · 마지막 줄 뒤에 자동으로 붙음 */
   lines: string[];
   sign: string;
+  credit: string;
 };
 
 export type GraduationData = {

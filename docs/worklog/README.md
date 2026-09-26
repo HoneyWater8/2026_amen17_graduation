@@ -26,6 +26,8 @@
 | 2026-09-22 | [봉투 개봉 속도 복원](./2026-09-22-envelope-opening-speed-restored.md) |
 | 2026-09-26 | [초원별 간증 영상 10편 원본 정리](./2026-09-26-testimony-originals-intake.md) |
 | 2026-09-26 | [새 간증 영상 10편 변환과 공개 배포](./2026-09-26-testimony-video-deployment.md) |
+| 2026-09-26 | [맺는 말씀 제목과 제작자 표기](./2026-09-26-closing-credit.md) |
+| 2026-09-26 | [전체화면 고화질 전환](./2026-09-26-fullscreen-video-quality.md) |
 
 ## 작성 규칙
 

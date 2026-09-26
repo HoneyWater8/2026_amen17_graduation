@@ -30,10 +30,10 @@ assets/
 │     └─ 07-장년.mp4                # 2026-09-22 추가 수령분
 └─ video-work/                       # 변환 중간 파일 · 로그 · 검증 결과. Git 제외
 
-FE/public/video/                    # 재생용: 새 간증 10편과 감사 합본, 총 22개 파일
+FE/public/video/                    # 재생용: 새 간증 10편과 감사 합본, 총 33개 파일
 ├─ testimony/
-│  └─ 01~10/{preview,full}.mp4
-└─ graduation/{preview,full}.mp4     # 감사 영상 7개를 합친 영상
+│  └─ 01~10/{preview,full,hd}.mp4
+└─ graduation/{preview,full,hd}.mp4     # 감사 영상 7개를 합친 영상
 ```
 
 `public`의 파일은 로컬 Vite 빌드 시 그대로 `dist`에 복사된다. 편집용 원본을 배포 결과에 섞지 않기 위해 원본은 `assets/video-originals/`에 보관한다. 원본과 재생용 영상 모두 Git에 포함하지 않는다. 현재 연결된 배포용 경량본 11개는 Vercel Blob에 올렸으며, Git 빌드는 환경 변수의 공개 URL로 연결한다.
@@ -49,7 +49,7 @@ FE/public/video/                    # 재생용: 새 간증 10편과 감사 합�
 | 접근 · 리전 | Public · `icn1` (서울) |
 | 공개 주소 기준 | `https://zw4d65fklime6ave.public.blob.vercel-storage.com/` |
 | 현재 연결 파일 | 경량본 11개, 총 221,557,417 B (211.29 MiB) |
-| 저장소 보존 파일 | 이전 간증 4개 포함 총 15개, 245.62 MiB |
+| 저장소 보존 파일 | 고화질 11개·이전 간증 4개 포함 총 26개, 943.25 MiB |
 | 적용 환경 | Production · Preview. Development는 로컬 파일 기본 경로 유지 |
 
 다음 경로를 위 공개 주소 기준에 이어 붙인 전체 URL이 각 환경 변수의 값이다. 파일명의 12자리 값은 로컬 파일 SHA-256의 앞부분이며, 교체 시 새 경로를 사용해 기존 캐시와 구분한다.
@@ -68,7 +68,7 @@ FE/public/video/                    # 재생용: 새 간증 10편과 감사 합�
 | `VITE_TESTIMONY_10_VIDEO_URL` | `video/testimony/10/preview-ca24debc3ed7.mp4` |
 | `VITE_GRADUATION_VIDEO_URL` | `video/graduation/preview-2b5c48754661.mp4` |
 
-이미 등록한 환경 변수를 유지하면 이후 Git 푸시에도 영상이 연결된다. **원본과 `full.mp4`는 업로드하지 않았다.** 현재 플레이어가 사용하는 경량본만 공개했으며, 이전 간증 Blob 4개는 복구용으로 보존한다. 새 간증의 고화질본만 약 2.63 GiB이므로 현재 저장소에는 올리지 않았다. 고화질본 공개 배포는 전체화면 화질 전환 구현과 함께 진행한다.
+이미 등록한 환경 변수를 유지하면 이후 Git 푸시에도 영상이 연결된다. **원본과 `full.mp4`는 업로드하지 않았다.** 경량본과 별도의 웹 고화질본 `hd.mp4`를 공개하고, 이전 간증 Blob 4개는 복구용으로 보존한다. `full.mp4` 11개의 합계가 약 3.42GB라, 해상도를 유지한 `hd.mp4`를 따로 압축해 무료 저장 공간 안에 맞췄다.
 
 간증·감사 영상을 통틀어 한 번에 하나만 재생한다. 새 영상의 재생이 시작되면 공통 `VideoSlot`이 다른 영상들을 일시정지하며, 재생 위치는 초기화하지 않는다.
 
@@ -77,13 +77,45 @@ FE/public/video/                    # 재생용: 새 간증 10편과 감사 합�
 1. 아래 변환 절차로 로컬 재생본을 만들고 재생·길이·순서를 확인한다.
 2. `FE/`에서 로그인된 Vercel CLI로 기존 Blob 저장소에 업로드한다. 예: `npx vercel blob put public/video/testimony/02/preview.mp4 --access public --pathname video/testimony/02/preview-<새 SHA256 앞 12자리>.mp4 --content-type video/mp4 --scope su-heon-choi-s-projects`.
 3. 반환된 공개 URL에 `200`, `video/mp4`, 정확한 파일 크기, `Range` 요청의 `206` 응답을 확인한다.
-4. 해당 `VITE_*_VIDEO_URL`을 Production/Preview에 등록하거나 갱신한다. 예: `npx vercel env add VITE_TESTIMONY_2_VIDEO_URL production,preview --value <공개 URL> --force --yes --no-sensitive --scope su-heon-choi-s-projects`. 미연결 초원도 기존 환경 변수 연결을 사용하므로 영상 URL을 등록하면 된다.
+4. 해당 `VITE_*_VIDEO_URL`과 `VITE_*_VIDEO_FULL_URL`을 Production/Preview에 등록하거나 갱신한다. 예: `npx vercel env add VITE_TESTIMONY_2_VIDEO_URL production,preview --value <공개 URL> --force --yes --no-sensitive --scope su-heon-choi-s-projects`. 영상 교체 시 경량본·고화질본을 함께 갱신해 같은 내용과 재생 위치를 유지한다.
 5. 코드·영상 관리 문서 등 변경 사항을 `main`에 커밋·푸시해 Vercel 자동 배포로 반영한다. 직접 배포 명령은 사용하지 않는다. Vite는 빌드 시 URL을 넣으므로 **환경 변수 변경만으로 기존 배포가 바뀌지는 않는다.**
 6. 실제 프로덕션 페이지에서 재생과 구간 이동을 확인한다. 새 배포가 검증될 때까지 기존 Blob을 삭제하지 않는다.
 
 CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 59.25.0의 저장소 연결은 `VERCEL_OIDC_TOKEN`과 `BLOB_READ_WRITE_TOKEN`을 내려주지만 `BLOB_STORE_ID`는 빠져 있었다. 인증 만료로 접근 거절이 발생하면 `vercel env pull .env.local --yes`로 갱신한다. 2026-09-26 CLI 60.0.1에서 갱신 후 업로드를 확인했다. 두 OIDC 값이 모두 필요하다는 오류가 나면 `.env.local`에 `BLOB_STORE_ID="store_zw4d65fKlIme6aVE"`를 함께 지정한다. 인증 토큰은 문서·Git·프론트엔드 번들에 넣지 않으며 `VITE_` 접두사도 붙이지 않는다. `vercel env pull` 등이 `.gitignore` 끝에 `.env*`를 추가하면 기존 `!.env.example` 예외가 유지되도록 중복 줄을 제거한다.
 
 현재 Hobby 플랜을 유지한다. 무료 포함량은 저장 공간 1GB, 월 Blob 전송량 10GB이며, 한도를 넘으면 접근이 제한될 수 있으므로 Vercel 대시보드에서 사용량을 확인한다. [Vercel Blob 사용량·요금](https://vercel.com/docs/vercel-blob/usage-and-pricing)
+
+## 전체화면 고화질
+
+2026-09-26 간증 10편과 감사 합본 모두 전체화면 화질 전환을 구현했다. 고화질 파일 11개를 기존 Public Blob에 업로드하고 Production/Preview의 `VITE_TESTIMONY_1_VIDEO_FULL_URL`~`VITE_TESTIMONY_10_VIDEO_FULL_URL`, `VITE_GRADUATION_VIDEO_FULL_URL`에 등록했다. **앱 변경은 `main` 커밋·푸시를 통한 자동 배포로 반영한다.**
+
+- 평상시 `preview.mp4`, 영상 전체화면에서만 `hd.mp4`를 요청한다. 재생 위치·재생/일시정지·속도·음량·음소거를 유지하며 같은 video 요소의 소스를 교체한다.
+- 고화질 오류나 15초 로딩 시간 초과 시 같은 위치의 경량본으로 복귀한다. 고화질이 한 번 실패한 플레이어는 같은 페이지 세션에서 반복 요청하지 않는다.
+- 로딩 중 다른 영상을 재생하면 예약된 자동 재개도 취소한다. 브라우저가 자동 재개를 제한하면 같은 위치에서 재생 버튼으로 이어 본다.
+- 표준 `fullscreenchange`와 Safari의 `webkitbeginfullscreen`, `webkitendfullscreen`, `webkitpresentationmodechanged`를 처리한다. PiP와 브라우저 창 확대는 영상 전체화면으로 취급하지 않는다.
+- 로컬은 `/video/testimony/NN/hd.mp4`, `/video/graduation/hd.mp4`를 사용한다. 원격 경량본만 지정하고 고화질 URL을 생략한 환경은 경량본을 유지한다.
+
+`hd.mp4`는 `full.mp4`를 H.264 CRF 24 / medium으로 다시 압축한 공개 전송용 파일이다. 해상도·프레임률·AAC 음성을 유지하며, 원본 비트스트림과 동일하지는 않다. 기존 원본·`full.mp4`는 그대로 보존한다.
+
+고화질 업로드 합계 731,514,520 B(697.63 MiB). 기존 경량본·이전 간증 4개까지 포함한 Blob 전체는 989,065,457 B(943.25 MiB), 총 26개다. Hobby 저장 공간 포함량 1GB 안에 맞췄으며 요금제를 변경하지 않았다. 여유는 약 10.9MB이므로 추가 업로드 전에 용량을 확인한다. 월 전송량은 별도로 사용량을 확인한다.
+
+| 영상 | 해상도 | hd.mp4 | 공개 경로 |
+|---|---|---|---|
+| 초원 01 | 1920×1080 | 33.52 MiB | `video/testimony/01/hd-cf9c08aa76b1.mp4` |
+| 초원 02 | 1920×1080 | 35.82 MiB | `video/testimony/02/hd-2eef913fb945.mp4` |
+| 초원 03 | 1920×1080 | 36.90 MiB | `video/testimony/03/hd-02dfb6635ad4.mp4` |
+| 초원 04 | 1280×720 | 28.25 MiB | `video/testimony/04/hd-4e38d7ef71ce.mp4` |
+| 초원 05 | 1920×1080 | 35.02 MiB | `video/testimony/05/hd-a70c9c6c55c1.mp4` |
+| 초원 06 | 1920×1080 | 39.05 MiB | `video/testimony/06/hd-08104099f4c5.mp4` |
+| 초원 07 | 1920×1080 | 47.41 MiB | `video/testimony/07/hd-7d8633c15a08.mp4` |
+| 초원 08 | 1920×1080 | 30.03 MiB | `video/testimony/08/hd-e2f1c0230f97.mp4` |
+| 초원 09 | 1920×1080 | 47.34 MiB | `video/testimony/09/hd-be57cae57abd.mp4` |
+| 초원 10 | 1280×720 | 12.98 MiB | `video/testimony/10/hd-c45b743a768d.mp4` |
+| 감사 합본 | 2560×1440 | 351.30 MiB | `video/graduation/hd-5210fb76a59d.mp4` |
+
+Windows Chrome의 실제 전체화면에서 전환과 오류 복귀를 검증했다. 공개 Blob URL을 연결한 빌드에서도 11편 모두 재생 위치·설정을 보존하며 원본 해상도와 540p 사이를 왕복했다. Safari 이벤트 처리는 자동 회귀 테스트로 확인했으며, iPhone·카카오 인앱 브라우저 실기기 확인은 별도로 필요하다.
+
+관련 API: [MDN fullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event), [MDN load](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/load), [Apple HTMLVideoElement](https://developer.apple.com/documentation/webkitjs/htmlvideoelement).
 
 ## 초원별 수령 현황
 
@@ -117,11 +149,11 @@ CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 5
 | 새 간증 영상 10개 | 960×540, H.264, CRF 24, 원본의 24·29.97·30fps 및 AAC 음성 유지 | 1920×1080 8개 / 1280×720 2개(04·10), 원본 H.264/AAC 스트림을 재압축 없이 보존 |
 | 감사 영상 통합본 | 960×540, H.264, CRF 24, 30fps | 2560×1440, H.264, CRF 19, 30fps, AAC 48kHz 스테레오 |
 
-모든 파일은 MP4의 재생 정보(`moov`)를 앞에 둔 faststart 형식이다. 경량본과 고화질본의 영상 내용·시작 지점·길이를 맞춰 나중에 재생 위치를 유지하며 전환할 수 있게 했다.
+모든 파일은 MP4의 재생 정보(`moov`)를 앞에 둔 faststart 형식이다. 경량본과 고화질본의 영상 내용·시작 지점·길이를 맞춰 재생 위치를 유지하며 전환할 수 있게 했다.
 
 감사 영상 원본은 720p·1080p·정사각형·2336×1080 영상이 섞여 있다. 가장 넓은 원본을 줄이지 않고 16:9 화면 안에 담기 위해 통합 고화질본을 2560×1440으로 만들었다. 작은 원본을 확대해도 원본에 없던 디테일이 생기는 것은 아니다. 비율이 다른 영상은 자르거나 늘이지 않고 여백을 둔다. 회전 정보는 실제 화면 방향에 반영하며, HDR 영상은 SDR BT.709로 변환한다.
 
-졸업 예배와 간증 초원 01~10은 배포 환경에서 Vercel Blob의 경량본 URL을 사용한다. 환경 변수가 없는 로컬에서는 각각 `/video/graduation/preview.mp4`, `/video/testimony/NN/preview.mp4`를 사용한다. 로드 실패 시 준비 안내를 표시한다. 고화질본 공개 업로드와 전체화면에서 고화질본으로 소스를 전환하는 기능은 후속 작업이다.
+졸업 예배와 간증 초원 01~10은 배포 환경에서 Vercel Blob의 경량본 URL을 사용한다. 환경 변수가 없는 로컬에서는 각각 `/video/graduation/preview.mp4`, `/video/testimony/NN/preview.mp4`를 사용한다. 로드 실패 시 준비 안내를 표시한다. 전체화면용 고화질 공개 URL과 전환 구현은 위 「전체화면 고화질」을 따른다.
 
 ### 생성 결과
 
@@ -139,7 +171,7 @@ CLI 인증 정보는 Git 제외된 `FE/.env.local`에서 읽는다. Vercel CLI 5
 | 10 부어부어 초원 | 1분 44초 | 8.27 MiB | 24.54 MiB |
 | 졸업 예배 감사 통합본 | 12분 33초 | 65.30 MiB | 576.98 MiB |
 
-새 간증 경량본 10개의 합계는 145.99 MiB로, 고화질본 합계 2688.67 MiB보다 약 94.6% 작다. 원본 해상도를 유지한 파일은 로컬에 보관하며 공개 화면에는 경량본을 연결했다.
+새 간증 경량본 10개의 합계는 145.99 MiB로, 고화질본 합계 2688.67 MiB보다 약 94.6% 작다. 보존용 `full.mp4`는 로컬에 두고, 별도로 압축한 `hd.mp4`를 전체화면용으로 사용한다.
 
 ## 감사 통합본 구성
 
@@ -168,7 +200,11 @@ Windows에서는 변환 전에 로컬 미리보기 서버와 해당 영상을 �
 ```powershell
 python scripts/prepare-videos.py --section testimony
 python scripts/prepare-videos.py --section graduation
-# 전체 변환
+# 기존 full에서 웹 고화질본만 생성
+python scripts/prepare-videos.py --section hd
+# 감사 합본만 생성하거나 간증과 나누어 실행
+python scripts/prepare-videos.py --section hd --hd-section graduation
+# 전체 변환 (preview/full/hd 모두)
 python scripts/prepare-videos.py --section all
 ```
 
