@@ -33,11 +33,11 @@ export const EV = {
 
 export const FF = {
   /** 한글 전체 + 기본 body */
-  serif: '"Nanum Myeongjo", serif',
+  serif: '"Amen17 Myeongjo", serif',
   /** 영문·숫자 전용. ⚠ 한글 글리프가 없어 한글 섞인 문자열에 쓰면 서체가 갈라짐 */
-  latin: '"Cinzel Decorative", "Nanum Myeongjo", serif',
+  latin: '"Amen17 Decorative", "Amen17 Myeongjo", serif',
   /** 본문 sans 자리 — 나눔명조로 통일 (Pretendard는 용량 문제로 제거) */
-  sans:  '"Nanum Myeongjo", serif',
+  sans:  '"Amen17 Myeongjo", serif',
 };
 
 /** 모션 값 — 봉투가 열리는 기존 속도를 유지하고, 동작이 끝나면 지연 없이 본문으로 넘어간다. */

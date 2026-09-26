@@ -22,11 +22,17 @@ metadata:
 | 팀 | `su-heon-choi-s-projects` / orgId `team_i5Fp7jSWD7stWHUbGSzKpoSA` |
 | 프로젝트 | `2026_amen17_graduation` / `prj_TmiwVXQoDb3x6I84eMzIo612WUgF` |
 | 프로덕션 도메인 | https://2026amen17graduation.vercel.app |
-| `vercel.json` | **없음** — 설정은 전부 대시보드. 참고 레포와 동일 |
+| `vercel.json` | `FE/vercel.json` — 해시 자산 1년·고정 사진/포스터/아이콘 1시간 브라우저 캐시. 프로젝트 연결 설정은 대시보드 |
 
 orgId는 [[reference-repo-hanaro-festival]]의 Vercel 프로젝트와 **같은 팀**입니다. 이전 프로젝트는 삭제된 상태였습니다.
 
-## 현재 요금제 — Hobby · 영상 저장소 차단
+## 현재 영상 저장소 — R2 · 기존 Blob 삭제 완료
+
+**2026-09-27 사용자 요청으로 기존 Vercel Blob 저장소 `store_zw4d65fKlIme6aVE`와 내부 영상 26개(989,065,457B)를 삭제했다.** R2 영상 22개, 실배포 번들, Production/Preview 환경 변수를 확인한 뒤 삭제했으며 팀 전체 Blob 저장소 목록이 비어 있음을 확인했다. 현재 영상은 R2에서 제공하고 웹앱은 Vercel Hobby에서 유지한다. 로컬 원본과 full은 보존했다. [삭제·최적화 검토 기록](../worklog/2026-09-27-optimization-review.md).
+
+**How to apply:** 아래 Blob 관련 내용은 이전 설정과 장애 경위다. 삭제된 저장소로 업로드하거나 과거 Blob 배포로 되돌리지 않는다. 영상 교체는 R2 운영 문서를 따른다. 이번 삭제 요청은 로컬 원본이나 R2 삭제 권한을 뜻하지 않는다.
+
+## 2026-09-26 요금제 취소 당시 — Hobby · Blob 차단
 
 **2026-09-26 사용자가 장애 복구를 위해 Pro로 전환했다가 같은 날 취소했습니다.** 23:54 KST 팀 API에서 `billing.plan=hobby`, `billing.status=active`, `billing.period=null`, `billing.cancelation=null`을 확인했습니다. 예약 취소 상태가 아니라 Hobby 전환이 이미 적용됐습니다. 사용량 응답의 `creditBalance`도 `null`이며 이전 $18.15를 계속 사용할 수 있다고 안내하면 안 됩니다. 실제 환불·최종 정산액은 확인하지 않았습니다.
 

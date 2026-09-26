@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-**원본 자산은 저장소에 넣지 않습니다.** 사진은 리사이즈본만 커밋합니다. 영상은 원본과 MP4 재생용 변환본 모두 로컬에 보관하고, 변환 스크립트·관리 문서와 별도 WebP 썸네일만 커밋합니다. 공개 재생용 경량본과 웹 고화질본은 Vercel Blob에 따로 업로드합니다.
+**원본 자산은 저장소에 넣지 않습니다.** 사진은 리사이즈본만 커밋합니다. 영상은 원본과 MP4 재생용 변환본 모두 로컬에 보관하고, 변환 스크립트·관리 문서와 별도 WebP 썸네일만 커밋합니다. 공개 재생용 경량본과 웹 고화질본은 Cloudflare R2에 따로 업로드합니다.
 
 | 자산 | 원본 | 저장소 |
 |---|---|---|
-| 여정 사진 | 첫 수령분 원본은 **2026-09-11 삭제** (Google Drive에 있을 것으로 추정). 추가 수령 원본은 `assets/photo-originals/fellowship/`과 `graduation/`에 보관 | `FE/public/journey/<slug>/{thumb,full}/NN.jpg` (리사이즈본만 커밋) |
+| 여정 사진 | 첫 수령분 원본은 **2026-09-11 삭제** (Google Drive에 있을 것으로 추정). 추가 수령 원본은 `assets/photo-originals/fellowship/`과 `graduation/`에 보관 | `FE/public/journey/<slug>/{thumb,full}/NN.webp` (리사이즈본만 커밋) |
 | 영상 | **2026-09-26 기준: `assets/video-originals/`에 원본 21개 보존**. 새 간증 10개 + 이전 간증 4개 + 감사 7개 | `FE/public/video/`에 새 간증 10개·감사 합본의 preview/full/hd 재생본 33개 보관. 원본·변환 중간 파일·재생본 모두 git 제외 |
 | 영상 썸네일 | 기존 경량본에서 추출 | `FE/public/video-posters/`의 WebP 11장은 Git에 포함. 영상 교체 시 `--section posters`로 갱신 |
 
@@ -20,10 +20,12 @@ metadata:
 - 새 사진을 받으면 `scripts/resize-photos.py --source <원본 파일 또는 폴더> --slug <시기> --start <첫 번호>`로 변환합니다. `pip install pillow` 필요. 폴더를 지정할 때는 새 사진만 있는 폴더를 사용합니다.
 - 그다음 `FE/src/data/graduation.ts`에서 **장수만** 고칩니다 — 경로는 `photosOf(slug, count, label)`이 규칙으로 만듭니다. 파일명을 나열하지 마세요.
 - **첫 수령분 59장은 로컬에 원본이 없습니다.** 해당 사진을 다른 크기로 다시 뽑거나 크롭을 바꿔야 하면 발주 측(또는 Google Drive)에서 원본을 다시 받아야 합니다. 첫 수령분은 thumb 320w · full 1280w 두 벌뿐입니다.
-- 추가 수령한 `KakaoTalk_20260916_115318409_02.jpg`는 `assets/photo-originals/fellowship/`에 원본 그대로 보관하며 Git에서 제외합니다. 화면에서는 `fellowship/{thumb,full}/18.jpg`를 사용합니다.
+- 추가 수령한 `KakaoTalk_20260916_115318409_02.jpg`는 `assets/photo-originals/fellowship/`에 원본 그대로 보관하며 Git에서 제외합니다. 화면에서는 `fellowship/{thumb,full}/18.webp`를 사용합니다.
 - 사진을 일부만 추가할 때는 기존 번호 다음에 이어 붙입니다. **2026-09-22부터 변환 도구가 기존 출력 덮어쓰기를 거부**하므로 `--start`로 새 번호를 지정합니다. 규격은 thumb 320w·품질 78 / full 1280w·품질 82입니다.
 - 졸업 예배는 **2026-09-20 진행 완료**이며 사진을 더 받을 예정입니다. 단체 사진 원본은 `assets/photo-originals/graduation/01.jpg`로 보관했고, 다음 사진은 `02.jpg`부터 추가합니다. 수령 당시 파일명 `감사영상 추가된거.jpg`는 내용과 달랐으므로 원본 폴더의 `inventory.json`에 출처로만 남겼습니다.
 - **제자 수업 사진은 더 이상 수급 대기 대상이 아닙니다.** 2026-09-16 발주 측의 최종 삭제 요청을 사용자가 전달했습니다. 성구암송은 앞선 대화에서 나온 대안일 뿐 확정 요청이 아니므로, 별도 지시 없이 대체 항목을 만들거나 사진을 기다리며 복원하지 않습니다.
+
+**2026-09-27 이미지·폰트 최적화:** 새 화면은 사진 WebP 122개를 사용합니다. 기존 JPEG는 `assets/photo-originals/resized-before-webp/`에 복사·해시 검증했고, 이미 열린 페이지의 이전 JS가 사진을 계속 불러올 수 있도록 기존 공개 JPEG 주소도 보존합니다. 새 화면에서는 JPEG를 받지 않습니다. 추가 수령 원본 2장은 원본에서 다시 변환했습니다. 씰은 기존 PNG와 RGBA 픽셀이 같은 무손실 WebP를 `FE/src/assets/wax-seal.webp`에서 제공합니다. 명단·문구의 새 글자는 빌드의 부분 폰트 검사 대상입니다. 누락 안내가 나오면 `python scripts/prepare-fonts.py`로 재생성하며, 로컬 원본 캐시가 없는 경우에만 `--download`를 사용합니다. 자세한 방법·라이선스는 README를 따릅니다.
 
 ## 로컬 영상 · 보존과 후속 작업
 
@@ -43,7 +45,7 @@ metadata:
 
 재생용 파일은 총 **33개**다. 간증 10편과 감사 통합본 1편에 각각 `preview.mp4`, `full.mp4`, `hd.mp4`가 있다. 새 환경에서 저장소를 클론해도 영상 파일은 내려오지 않으므로, 현재 원본 보관 폴더를 따로 옮기거나 수령처에서 다시 확보해야 한다.
 
-**2026-09-27 영상 호스팅을 Cloudflare R2로 이전한다.** 영상 교체는 로컬 변환 → R2 업로드 → 공개 URL 검증 → 환경 변수 변경 → `main` 커밋·푸시를 통한 자동 배포 순서다. Vercel 직접 배포 명령은 사용하지 않는다. Git 푸시만으로 로컬 영상 파일이 전송되지는 않는다. 새 버킷은 `amen17-graduation-videos` (APAC, Standard)이며 읽기 전용 Worker가 공개 영상을 제공한다. 이전 대상은 경량본 11개·고화질 11개, 총 953,071,937B다. 기존 원본·full·Blob 파일은 보존한다. 파일명에는 SHA-256 앞 12자리를 붙여 교체 시 새 경로를 사용한다. 이전 완료 단계와 운영 절차는 [Cloudflare R2 영상 운영](../cloudflare-r2.md)을 따른다.
+**2026-09-27 영상 호스팅을 Cloudflare R2로 이전했다.** 영상 교체는 로컬 변환 → R2 업로드 → 공개 URL 검증 → 환경 변수 변경 → `main` 커밋·푸시를 통한 자동 배포 순서다. Vercel 직접 배포 명령은 사용하지 않는다. Git 푸시만으로 로컬 영상 파일이 전송되지는 않는다. 새 버킷은 `amen17-graduation-videos` (APAC, Standard)이며 읽기 전용 Worker가 공개 영상을 제공한다. 이전 파일은 경량본 11개·고화질 11개, 총 953,071,937B다. 기존 원본·full은 보존한다. **같은 날 사용자 요청으로 이전 Vercel Blob 파일 26개와 저장소를 삭제했으므로 Blob 백업은 없다.** 교체 전 원본 4편은 로컬 archive에 남아 있다. 파일명에는 SHA-256 앞 12자리를 붙여 교체 시 새 경로를 사용한다. 현재 상태와 운영 절차는 [Cloudflare R2 영상 운영](../cloudflare-r2.md)을 따른다.
 
 간증 섹션 참고 이미지 원본은 `C:\Users\kjyjy\Downloads\KakaoTalk_20260915_094358116.png`입니다. 사용자 제공 이미지이며 저장소에는 포함하지 않았습니다. 확정 초원명과 배치 순서는 `FE/src/data/graduation.ts`를 기준으로 확인합니다.
 

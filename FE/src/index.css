@@ -7,7 +7,7 @@ html, body {
   overflow: hidden;
   /* 스크롤 바운스 시 다른 색이 노출되지 않도록 루트 바깥 여백색과 일치 */
   background: #E5DCC8;
-  font-family: 'Nanum Myeongjo', serif;
+  font-family: 'Amen17 Myeongjo', serif;
   color: #1E1B16;
 }
 

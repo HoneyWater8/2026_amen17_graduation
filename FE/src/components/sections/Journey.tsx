@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { EV, FF } from '../../theme/tokens';
 import { Section } from '../common/Section';
 import { SectionHead } from '../common/SectionHead';
@@ -10,6 +11,7 @@ type JourneyProps = { active: boolean };
 
 /** 03 함께 걸어온 길 — 시기별 사진과 감사 영상을 함께 표시한다. */
 export function Journey({ active }: JourneyProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   return (
     <Section label="03 Our Journey" bg={EV.paper}>
       <Reveal active={active}>
@@ -47,7 +49,9 @@ export function Journey({ active }: JourneyProps) {
                 }}>{t.desc}</div>
               )}
 
-              {t.photos && t.photos.length > 0 && <PhotoRail photos={t.photos} />}
+              {t.photos && t.photos.length > 0 && (
+                <PhotoRail photos={t.photos} active={active} lightboxOpen={lightboxOpen} onLightboxChange={setLightboxOpen} />
+              )}
 
               {/* 졸업 예배 후 사진과 감사 영상을 함께 볼 수 있도록 각각 표시한다. */}
               {t.video && (
@@ -59,6 +63,7 @@ export function Journey({ active }: JourneyProps) {
                     }}>{t.video.desc}</div>
                   )}
                   <VideoSlot
+                    sectionActive={active}
                     video={t.video}
                     iconSize={34}
                     pad={5}

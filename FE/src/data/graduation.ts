@@ -27,7 +27,7 @@ const GRADUATION_POSTER = import.meta.env.VITE_GRADUATION_VIDEO_POSTER || '/vide
 /**
  * 시기별 사진 경로 생성.
  *
- * 원본을 `FE/public/journey/<slug>/{thumb,full}/NN.jpg` 규칙으로 미리 리사이즈해 두었으므로
+ * 원본을 `FE/public/journey/<slug>/{thumb,full}/NN.webp` 규칙으로 미리 리사이즈해 두었으므로
  * 파일명을 일일이 나열하지 않고 장수만 적는다. 사진을 더하거나 빼면 count만 고치면 된다.
  * (원본 → 2벌 생성 절차는 README 「콘텐츠 교체 방법」 참고)
  */
@@ -36,8 +36,8 @@ function photosOf(slug: string, count: number, label: string): JourneyPhoto[] {
     const n = String(i + 1).padStart(2, '0');
     return {
       caption: `${label} 사진 ${i + 1}`,
-      thumb: `/journey/${slug}/thumb/${n}.jpg`,
-      full: `/journey/${slug}/full/${n}.jpg`,
+      thumb: `/journey/${slug}/thumb/${n}.webp`,
+      full: `/journey/${slug}/full/${n}.webp`,
     };
   });
 }

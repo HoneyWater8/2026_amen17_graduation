@@ -34,6 +34,8 @@
 | 2026-09-26 | [Pro 취소 후 Hobby 전환과 영상 차단 확인](./2026-09-26-cancellation-status.md) |
 | 2026-09-27 | [Cloudflare R2 영상 이전과 읽기 전용 Worker](./2026-09-27-cloudflare-r2.md) |
 | 2026-09-27 | [영상 버퍼 확보와 R2 직접 전송으로 반복 로딩 개선](./2026-09-27-video-buffering.md) |
+| 2026-09-27 | [전체 최적화 검토와 기존 Vercel Blob 삭제](./2026-09-27-optimization-review.md) |
+| 2026-09-27 | [화면 밖 모션·캐시·폰트·이미지 최적화](./2026-09-27-static-optimization.md) |
 
 ## 작성 규칙
 

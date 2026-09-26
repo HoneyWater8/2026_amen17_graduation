@@ -3,6 +3,8 @@ import type { PointerEvent as ReactPointerEvent } from 'react';
 import { EV, FF, LAYOUT } from '../../theme/tokens';
 import { useShuffled } from '../../hooks/useShuffled';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { useInView } from '../../hooks/useInView';
+import { usePageVisible } from '../../hooks/usePageVisible';
 import { Lightbox } from './Lightbox';
 import { track } from '../../utils/analytics';
 import type { JourneyPhoto } from '../../data/types';
@@ -29,6 +31,9 @@ type DragState = {
 
 type PhotoRailProps = {
   photos: JourneyPhoto[];
+  active: boolean;
+  lightboxOpen: boolean;
+  onLightboxChange: (open: boolean) => void;
 };
 
 /**
@@ -39,10 +44,11 @@ type PhotoRailProps = {
  * 손으로 끌면 멈추고, 놓으면 관성이 붙었다가 다시 자동 흐름으로 돌아온다.
  * 카드를 탭하면 라이트박스로 원본을 크게 본다.
  */
-export function PhotoRail({ photos }: PhotoRailProps) {
+export function PhotoRail({ photos, active, lightboxOpen, onLightboxChange }: PhotoRailProps) {
   const shuffled = useShuffled(photos);
   const many = shuffled.length > 1;
   const trackRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const lastTimeRef = useRef(0);
   const cycleRef = useRef(0);
@@ -56,9 +62,12 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   const [dragging, setDragging] = useState(false);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const reduced = usePrefersReducedMotion();
+  const inView = useInView(viewportRef, active);
+  const loadPhotos = useInView(viewportRef, active, '400px 0px', true);
+  const pageVisible = usePageVisible();
 
-  // 라이트박스가 열려 있거나 모션 감소 모드면 자동 흐름을 멈춘다.
-  const paused = !many || openIndex !== null || reduced;
+  // 화면 밖·숨긴 탭·확대 보기에서는 모든 레일의 프레임 예약을 중지한다.
+  const paused = !many || !inView || !pageVisible || lightboxOpen || reduced || dragging;
 
   const wrap = (x: number) => {
     const c = cycleRef.current;
@@ -77,11 +86,13 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   }, [shuffled.length]);
 
   useEffect(() => {
-    if (shuffled.length < 2) return;
+    if (paused) return;
+    // 정지한 시간까지 이동 거리로 합산하지 않아 재진입 때 사진이 튀지 않는다.
+    lastTimeRef.current = 0;
     let raf = 0;
     const tick = (t: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = t;
-      const dt = t - lastTimeRef.current;
+      const dt = Math.min(t - lastTimeRef.current, 64);
       lastTimeRef.current = t;
 
       if (!paused && !draggingRef.current && cycleRef.current > 0) {
@@ -96,7 +107,7 @@ export function PhotoRail({ photos }: PhotoRailProps) {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => { cancelAnimationFrame(raf); inertiaRef.current = 0; };
   }, [paused, shuffled.length]);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -151,6 +162,7 @@ export function PhotoRail({ photos }: PhotoRailProps) {
     if (dragRef.current.moved > DRAG_THRESHOLD) return;
     if (shuffled[i]?.full) {
       track('photo_open');
+      onLightboxChange(true);
       setOpenIndex(i);
     }
   };
@@ -162,6 +174,8 @@ export function PhotoRail({ photos }: PhotoRailProps) {
   return (
     <>
       <div
+        ref={viewportRef}
+        data-role="photo-rail"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -184,7 +198,7 @@ export function PhotoRail({ photos }: PhotoRailProps) {
           ref={trackRef}
           style={{
             display: 'flex', gap: CARD_GAP,
-            width: 'max-content', willChange: many ? 'transform' : undefined,
+            width: 'max-content', willChange: !paused ? 'transform' : undefined,
           }}
         >
           {cards.map((p, i) => {
@@ -209,10 +223,11 @@ export function PhotoRail({ photos }: PhotoRailProps) {
                 }}>
                   {p.thumb
                     ? <img
-                        src={p.thumb}
+                        src={loadPhotos ? p.thumb : undefined}
                         alt={p.caption}
                         draggable={false}
                         loading="lazy"
+                        decoding="async"
                         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       />
                     : p.tag}
@@ -226,7 +241,7 @@ export function PhotoRail({ photos }: PhotoRailProps) {
       <Lightbox
         photos={shuffled}
         index={openIndex}
-        onClose={() => setOpenIndex(null)}
+        onClose={() => { setOpenIndex(null); onLightboxChange(false); }}
         onMove={(next) => setOpenIndex((next + shuffled.length) % shuffled.length)}
       />
     </>

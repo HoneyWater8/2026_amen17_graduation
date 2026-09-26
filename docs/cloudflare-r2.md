@@ -9,7 +9,7 @@
 - 영상 주소: `https://amen17-graduation-videos.2026-amen17-graduation.workers.dev`.
 - 설정·코드: `cloudflare/video-worker/`. Worker는 GET 전용 임시 주소로 307 연결하고, 영상 본문은 브라우저가 R2 S3 경로에서 직접 받는다. HEAD는 R2 바인딩으로 처리한다. 버킷의 Public Development URL과 Custom Domain은 비활성 상태다.
 
-간증 10편과 감사 합본 1편의 `preview.mp4`·`hd.mp4` 22개(953,071,937B)를 이전한다. 원본과 `full.mp4`는 로컬에 보존한다. 기존 Blob 파일은 삭제하지 않는다.
+간증 10편과 감사 합본 1편의 `preview.mp4`·`hd.mp4` 22개(953,071,937B)를 R2로 이전했다. 원본과 `full.mp4`는 로컬에 보존한다. **2026-09-27 사용자 요청으로 기존 Vercel Blob 파일 26개와 저장소를 삭제했다.** 실배포·환경 변수의 R2 참조와 영상 22개 검증 후 삭제했으며, 과거 Blob 주소는 복구용으로 사용할 수 없다. [검증·삭제 기록](./worklog/2026-09-27-optimization-review.md).
 
 **검증·배포(2026-09-27):** 영상 22개 업로드와 공개 URL의 HEAD·Range·바이트 검증을 완료했다. Production/Preview 환경 변수 22개씩을 R2 주소로 갱신하고 다시 내려받아 일치 여부를 확인했다. 로컬 빌드에도 22개 R2 주소가 모두 포함되며 기존 Blob 호스트는 없다. **사용자가 버퍼링 없는 정상 재생을 확인하고 main 커밋·푸시를 지시했다.** 공개 반영은 Git 자동 배포를 사용한다. 배포의 Ready 상태와 기존 사이트가 제공하는 JS 번들의 R2 주소, 실제 재생을 함께 확인한다. 환경 변수만 바꾸어서는 기존 배포가 갱신되지 않는다.
 

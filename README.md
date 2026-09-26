@@ -14,7 +14,7 @@
 
 ## 현재 상태
 
-**디자인·명단·여정 사진 반영 완료. 2026-09-25 수령한 새 간증 영상 10편을 변환해 Vercel Blob으로 공개 배포했습니다. 간증 10편과 졸업 예배 감사 합본을 재생할 수 있습니다.**
+**디자인·명단·여정 사진 반영 완료. 새 간증 영상 10편과 졸업 예배 감사 합본을 Cloudflare R2에서 제공합니다. 2026-09-27 이전 Vercel Blob 파일과 저장소는 사용자 요청으로 삭제했습니다.**
 
 졸업 예배는 2026-09-20에 진행되었으며 명단 128명, 여정 사진 61장이 반영되어 있습니다. 초원명과 영상 등 콘텐츠는 [`FE/src/data/graduation.ts`](./FE/src/data/graduation.ts)에서 변경합니다.
 
@@ -27,7 +27,7 @@
 | 졸업생 명단 | ✅ **128명** 실명 반영 (2026-09-11) |
 | 여정 사진 | ✅ 61장 배치 (입학식 23 · 하나로가족한마당 19 · 식사 모임 18 · 졸업 예배 1) |
 | 공유 썸네일 · 탭 아이콘 | ✅ 1200×630 썸네일, 왁스 씰 favicon |
-| 졸업 예배 영상 | ✅ 감사 영상 7개 통합본의 경량·고화질 파일 준비, 사진 아래 경량본 연결 및 Vercel Blob 공개 배포 |
+| 졸업 예배 영상 | ✅ 감사 영상 7개 통합본의 경량·고화질 파일 준비, 사진 아래 영상 연결 및 Cloudflare R2 제공 |
 | 졸업 간증 영상 | ✅ 초원별 10개 카드와 실제 초원명<br>✅ 2026-09-26 새 수령본 10편의 변환·공개 URL 등록·교체 |
 | 열람 기한 처리 | ❌ **구현 안 함** — 배포를 직접 내릴 때까지 상시 공개 (2026-09-07 결정) |
 | 어워드(시상) 섹션 | ⏳ 후속 과제 |
@@ -41,7 +41,7 @@
 | Build/Dev | Vite 8 |
 | UI | React 19 + TypeScript 6 |
 | 배포 | Vercel (정적) |
-| Fonts | Nanum Myeongjo · Cinzel Decorative (Google Fonts) |
+| Fonts | Nanum Myeongjo · Cinzel Decorative 기반 자체 호스팅 WOFF2 부분 폰트 |
 | Lint | typescript-eslint, eslint-plugin-react-hooks |
 
 런타임 의존성은 `react`, `react-dom`, `@vercel/analytics` 세 개뿐입니다. 라우터·상태관리·CSS 프레임워크 없이 인라인 스타일과 로컬 state로 처리합니다. API·서버 상태가 없어 서버리스 함수도 두지 않았습니다.
@@ -85,7 +85,7 @@
 2026_amen17_graduation/
 ├── FE/                                 # 프론트엔드 (Vite + React + Vercel)
 │   ├── public/
-│   │   ├── seal/wax-seal.png           # 왁스 씰 (360×300, 73KB)
+│   │   ├── seal/wax-seal.png           # 아이콘 재생성용 PNG, 화면은 src/assets의 WebP 사용
 │   │   ├── journey/<slug>/             # 여정 사진 — thumb(320w) · full(1280w) 2벌
 │   │   ├── video/                      # 재생용 영상 — testimony/NN/ · graduation/ (git 제외)
 │   │   ├── video-posters/              # 재생 전 표시할 WebP 썸네일 11장 (Git 포함)
@@ -93,6 +93,8 @@
 │   ├── src/
 │   │   ├── App.tsx                     # 봉투 stage + 2레이어 조립
 │   │   ├── main.tsx
+│   │   ├── assets/                     # 해시 경로로 빌드하는 WOFF2 폰트 · 무손실 WebP 씰
+│   │   ├── fonts.css                  # 부분 폰트 @font-face
 │   │   ├── index.css                   # 글로벌 리셋 + @keyframes ev-breathe
 │   │   ├── theme/tokens.ts             # EV(색), FF(폰트), MOTION, LAYOUT
 │   │   ├── data/
@@ -156,7 +158,7 @@ npm test           # 지연 로딩·중단/재개·전체화면 전환·오류 �
 
 ## 배포 (Vercel)
 
-참고 레포와 동일한 방식입니다. **`vercel.json`을 두지 않고** 프로젝트 설정은 전부 Vercel 대시보드에서 관리합니다.
+프로젝트 연결·Root Directory는 Vercel 대시보드에서 관리합니다. `FE/vercel.json`은 정적 파일의 브라우저 캐시 헤더만 지정합니다. 해시가 붙는 `/assets/`는 1년, 고정 이름 사진·포스터·아이콘은 1시간 캐시하며 HTML은 기본 재검증을 유지합니다. 고정 파일을 즉시 교체해야 하면 새 파일명과 참조 경로를 사용합니다.
 
 | 설정 | 값 |
 |---|---|
@@ -167,7 +169,7 @@ npm test           # 지연 로딩·중단/재개·전체화면 전환·오류 �
 
 ### 새 작업 환경 — 기존 프로젝트 연결
 
-프로젝트와 Git 자동 배포는 이미 연결되어 있습니다. Blob 업로드·환경 변수 관리를 위해 로컬 CLI 연결이 필요한 경우에만 실행합니다.
+프로젝트와 Git 자동 배포는 이미 연결되어 있습니다. 환경 변수 관리를 위해 로컬 CLI 연결이 필요한 경우에만 실행합니다.
 
 ```sh
 cd FE
@@ -185,7 +187,7 @@ npx vercel link --project 2026_amen17_graduation --scope su-heon-choi-s-projects
 git push origin main      # → Vercel이 자동 빌드·배포
 ```
 
-푸시 후 Vercel의 자동 빌드·배포 결과와 실제 사이트를 확인합니다. `vercel deploy`, `vercel --prod`, `vercel redeploy` 같은 직접 배포 명령은 사용하지 않습니다. Blob 업로드와 환경 변수 등록에 사용하는 CLI 명령은 별개입니다.
+푸시 후 Vercel의 자동 빌드·배포 결과와 실제 사이트를 확인합니다. `vercel deploy`, `vercel --prod`, `vercel redeploy` 같은 직접 배포 명령은 사용하지 않습니다. R2 영상 업로드와 환경 변수 등록에 사용하는 CLI 명령은 별개입니다.
 
 > **Root Directory는 반드시 `FE`여야 합니다.** Git 빌드는 레포 루트를 기준으로 하며 앱의 `package.json`은 `FE/`에 있습니다.
 
@@ -266,6 +268,8 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 
 **졸업생 명단** — `roster` 배열. 4열 그리드라 개수 제한은 없습니다.
 
+**폰트 글자 추가** — `npm run build`는 명단·문구·공유창 등 소스 문자열을 검사합니다. 새 글자가 부분 폰트에 없으면 빌드가 실패하며 재생성 명령을 안내합니다. 레포 루트에서 `pip install fonttools brotli` 후 `python scripts/prepare-fonts.py --download`를 실행하고 생성된 WOFF2·manifest를 함께 커밋합니다. 이후에는 `--download` 없이 로컬 원본 캐시를 재사용합니다. 일반 배포 빌드는 Python·폰트 다운로드가 필요 없습니다. 원본·라이선스는 [폰트 안내](./FE/public/licenses/fonts/README.md)에 기록합니다.
+
 원본 시트는 [`docs/roster-2026-09.xlsx`](./docs/roster-2026-09.xlsx)이며 장년(남·여)·청년(남·여) 네 그룹이 열로 나뉘어 있습니다. 페이지에는 그룹 구분 없이 **이름 오름차순 한 덩어리**로 싣습니다. `이서영B`처럼 붙은 `B`는 **동명이인 구분자이므로 원본 표기를 그대로 씁니다** — 떼면 명단에서 누가 누구인지 구분되지 않습니다.
 
 **여정 사진** — 원본을 그대로 쓰지 않고 두 벌로 줄여서 넣습니다 (캐러셀 썸네일 320w · 라이트박스 1280w).
@@ -273,7 +277,7 @@ npx vercel env pull .env.local   # 대시보드에 등록한 값을 로컬로 �
 ```sh
 # 1) 원본 폴더를 레포 루트에 두고 scripts/resize-photos.py 의 FOLDERS 에 등록
 #    기존 시기: entrance(입학식), festival(하나로가족한마당), fellowship(식사 모임)
-# 2) 실행 — FE/public/journey/<slug>/{thumb,full}/NN.jpg 로 생성됨
+# 2) 실행 — FE/public/journey/<slug>/{thumb,full}/NN.webp 로 생성됨
 pip install pillow
 python scripts/resize-photos.py
 ```
@@ -284,7 +288,7 @@ python scripts/resize-photos.py
 photos: photosOf("entrance", 23, "입학식")   // 해당 시기의 실제 장수로 변경
 ```
 
-첫 수령분 59장은 **95MB → 11.6MB**로 줄었습니다. 원본 폴더는 `.gitignore` 처리되어 커밋되지 않습니다.
+현재 사진 61장의 thumb/full WebP 합계는 약 **9.00MB**입니다. 원본 폴더는 `.gitignore` 처리되어 커밋되지 않습니다. 2026-09-27 WebP 전환 전 JPEG는 로컬 `assets/photo-originals/resized-before-webp/`에 보존했습니다. 이미 열린 페이지의 사진 요청을 위해 기존 공개 JPEG 주소도 유지하며, 새 화면은 WebP만 요청합니다.
 
 **졸업 예배 사진 추가** — 원본은 `assets/photo-originals/graduation/NN.jpg`에 보관합니다. 현재 `01.jpg`가 있으며 다음 사진은 `02.jpg`부터 번호를 이어 붙입니다.
 
@@ -292,10 +296,10 @@ photos: photosOf("entrance", 23, "입학식")   // 해당 시기의 실제 장�
 python scripts/resize-photos.py --source assets/photo-originals/graduation/02.jpg --slug graduation --start 2
 ```
 
-위 명령은 해당 사진만 `FE/public/journey/graduation/{thumb,full}/02.jpg`로 변환합니다. 기존 출력은 덮어쓰지 않습니다. 추가한 뒤 `photosOf("graduation", 2, "졸업 예배")`처럼 장수도 갱신하세요.
+위 명령은 해당 사진만 `FE/public/journey/graduation/{thumb,full}/02.webp`로 변환합니다. 기존 출력은 덮어쓰지 않습니다. 추가한 뒤 `photosOf("graduation", 2, "졸업 예배")`처럼 장수도 갱신하세요.
 
 ```ts
-{ caption: "개강 첫날", tag: "01", image: "/journey/01.jpg" }
+{ caption: "개강 첫날", thumb: "/journey/entrance/thumb/01.webp", full: "/journey/entrance/full/01.webp" }
 ```
 
 **졸업 간증 영상** — `G.testimony.groups`에 10개 초원이 등록되어 있습니다. `testimonyOf()`의 두 번째 인자는 표시명이며, 배열 순서대로 왼쪽부터 배치합니다. 첫 번째 인자는 재생 집계용 고정 번호이므로 초원명을 바꾸어도 유지합니다.
@@ -341,7 +345,7 @@ EV.goldLt    = '#D8BE72'   // 어두운 배경 위 금색
 EV.seal      = '#8C2B22'   // 포인트 (씰·영문 라벨·다이아몬드)
 ```
 
-폰트 — 한글은 **Nanum Myeongjo**로 통일, 포인트 **Cinzel Decorative**는 라틴·숫자에만.
+폰트 — 한글은 **Nanum Myeongjo**, 라틴·숫자는 **Cinzel Decorative**의 모양을 유지합니다. 필요한 글자만 부분 폰트로 제공하며, OFL 예약 이름 준수를 위해 내부 이름은 `Amen17 Myeongjo`·`Amen17 Decorative`를 사용합니다.
 
 > ⚠️ 두 가지 주의사항이 코드 주석에도 박혀 있습니다.
 > 1. `EV.gold`(#A8862C)는 paper 위 대비가 3.21:1이라 **24px 미만 텍스트에 쓰면 안 됩니다.** `EV.goldTx`를 쓰세요.
@@ -369,7 +373,7 @@ EV.seal      = '#8C2B22'   // 포인트 (씰·영문 라벨·다이아몬드)
 |---|---|
 | `window.GRAD` 전역 객체 | `data/graduation.ts` named export + `data/types.ts` 타입 |
 | UMD React + Babel `.compiled.js` | Vite 번들 (CDN·Babel standalone 제거) |
-| `window.__resources.waxSeal` | `/seal/wax-seal.png` (public) |
+| `window.__resources.waxSeal` | `src/assets/wax-seal.webp` import (빌드 시 해시 경로) |
 | 507줄 단일 JSX | 섹션 6 + 공용 8 파일 |
 | `const E = {...}` / `EF` | `theme/tokens.ts`의 `EV` / `FF` |
 | `videos[]` + `curV` state | 통합본 1개로 확정 → `video` 단일 객체 |
@@ -409,7 +413,7 @@ Claude Design에서 작업한 핸드오프 번들 원본을 그대로 보존한 
 - [x] ~~카카오 공유용 `thumbnail.png` 제작~~ — 1200×630, 2026-09-11
 - [x] ~~`VITE_KAKAO_JS_KEY` 발급 + 도메인 등록~~ — 2026-09-11 완료
 - [ ] `public/icons/kakaotalk.png` (20×20 이상) — 없으면 인라인 SVG 말풍선으로 폴백
-- [ ] 폰트 자체 호스팅 + 서브셋 (Google Fonts 의존 제거)
+- [x] 폰트 자체 호스팅 + 부분 폰트 · 신규 글자 빌드 검사 — 2026-09-27
 - [ ] 어워드(시상) 섹션 — 디자인 1단계에서 보류된 후속 과제
 
 ---

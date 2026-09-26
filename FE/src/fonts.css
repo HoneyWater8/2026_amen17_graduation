@@ -1,0 +1,22 @@
+/* 부분 폰트의 원본·OFL은 public/licenses/fonts에 기록한다. URL은 빌드 시 해시가 붙는다. */
+@font-face {
+  font-family: 'Amen17 Myeongjo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/myeongjo-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Amen17 Myeongjo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/myeongjo-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Amen17 Decorative';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/decorative-400.woff2') format('woff2');
+}

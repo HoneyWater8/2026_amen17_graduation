@@ -10,9 +10,11 @@ import { track } from '../../utils/analytics';
 import { connectVideoQuality } from '../../utils/videoQuality';
 import type { VideoController } from '../../utils/videoQuality';
 import { G } from '../../data/graduation';
+import { useInView } from '../../hooks/useInView';
 
 type VideoSlotProps = {
   video: GradVideo;
+  sectionActive: boolean;
   /** 슬롯 비율. 제공되는 영상이 모두 16:9 가로 촬영본이라 이것이 기본 */
   aspectRatio?: string;
   /** 높이 상한. 16:9에서는 폭이 먼저 제한되므로 보통 지정할 필요가 없다 */
@@ -38,6 +40,7 @@ type VideoSlotProps = {
  */
 export function VideoSlot({
   video,
+  sectionActive,
   aspectRatio = '16 / 9',
   maxHeight,
   iconSize = 44,
@@ -50,6 +53,8 @@ export function VideoSlot({
   const [active, setActive] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const player = useRef<HTMLVideoElement>(null);
+  const slot = useRef<HTMLDivElement>(null);
+  const loadPoster = useInView(slot, sectionActive, '400px 0px', true);
   const controller = useRef<VideoController | null>(null);
   const showVideo = Boolean(video.src) && !failed;
   useEffect(() => {
@@ -74,6 +79,7 @@ export function VideoSlot({
   return (
     <div style={{ border: `1px solid ${EV.gold}`, padding: pad, background: EV.paperDeep }}>
       <div
+        ref={slot}
         data-role="video-slot"
         data-video-key={slotKey}
         style={{
@@ -87,7 +93,7 @@ export function VideoSlot({
             <video
               ref={player}
               aria-label={label}
-              poster={video.poster}
+              poster={loadPoster || hasStarted ? video.poster : undefined}
               controls={active}
               tabIndex={active ? 0 : -1}
               playsInline

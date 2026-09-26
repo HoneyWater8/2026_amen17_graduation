@@ -10,3 +10,4 @@ assets/photo-originals/
 # 영상 원본과 변환 중간 파일 — 재생용 파일만 FE/public/video/ 아래에 생성한다.
 assets/video-originals/
 assets/video-work/
+assets/font-work/

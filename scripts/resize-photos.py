@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-여정 사진 다운샘플링 — 캐러셀용 thumb(320w) + 라이트박스용 full(1280w)
+여정 사진 다운샘플링 — WebP 캐러셀용 thumb(320w) + 라이트박스용 full(1280w)
 
 원본은 스마트폰·DSLR 촬영본이라 장당 수 MB에 이른다(첫 수령분 59장 = 95MB).
 그대로 올리면 모바일에서 로딩이 감당이 안 되므로 두 벌로 줄여 public/journey/에 넣는다.
@@ -76,8 +76,8 @@ for ko, slug, src in jobs:
     # 추가 사진 때문에 이미 배치된 사진을 덮어쓰지 않도록 생성 전에 모두 확인한다.
     for i in range(args.start, args.start + len(files)):
         for sub in ('thumb', 'full'):
-            target = os.path.join(DST, slug, sub, f'{i:02d}.jpg')
-            if os.path.exists(target):
+            target = os.path.join(DST, slug, sub, f'{i:02d}.webp')
+            if os.path.exists(target) or os.path.exists(os.path.splitext(target)[0] + '.jpg'):
                 parser.error(f'기존 파일을 덮어쓸 수 없습니다: {target}. --start를 확인하세요.')
     for sub in ('thumb', 'full'):
         os.makedirs(os.path.join(DST, slug, sub), exist_ok=True)
@@ -91,8 +91,8 @@ for ko, slug, src in jobs:
                 out = im.copy()
                 if out.width > w:
                     out = out.resize((w, round(out.height * w / out.width)), Image.LANCZOS)
-                dst = os.path.join(DST, slug, sub, f'{i:02d}.jpg')
-                out.save(dst, 'JPEG', quality=q, optimize=True, progressive=True)
+                dst = os.path.join(DST, slug, sub, f'{i:02d}.webp')
+                out.save(dst, 'WEBP', quality=q, method=6)
                 total_out += os.path.getsize(dst)
 
     print(f'{slug}: {len(files)}장', flush=True)

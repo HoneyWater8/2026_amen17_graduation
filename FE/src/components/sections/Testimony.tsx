@@ -30,6 +30,7 @@ export function Testimony({ active }: TestimonyProps) {
           <Reveal key={group.id} delay={0.06} active={active}>
             <figure style={{ margin: 0, minWidth: 0 }}>
               <VideoSlot
+                sectionActive={active}
                 video={group.video}
                 slotKey={group.id}
                 label={group.name}

@@ -58,7 +58,7 @@ export function ScrollHint({ active, delay = 1500 }: ScrollHintProps) {
           position: 'absolute', left: '50%', bottom: 0, width: 7, height: 7,
           background: EV.seal,
           transform: 'translateX(-50%) rotate(45deg)',
-          animation: reduced ? undefined : MOTION.scrollHint,
+          animation: !visible || reduced ? undefined : MOTION.scrollHint,
         }} />
       </div>
     </div>
