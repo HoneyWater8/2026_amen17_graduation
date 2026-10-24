@@ -9,7 +9,7 @@
 - [이전 프로젝트 컨벤션 답습 선호](./prefers-mirroring-prior-project.md) — 새 구조를 발명하지 말 것
 - [관습적·담백한 UI 선호](./prefers-plain-conventional-ui.md) — 장식을 더하지 말고 먼저 제안할 것
 - [자산 파이프라인](./asset-pipeline.md) — 새 간증 10편 변환·공개 배포(2026-09-26) · 이전 간증 4편 별도 보존 · 영상 원본 21개·재생본 33개 · WebP 썸네일은 Git 포함 · 추가 졸업 사진·모바일 실기기 확인
-- [사용자 집계 설정](./analytics-setup.md) — Vercel+GA4 두 축. GA4는 HTML 스니펫으로 초기화. **2026-10 중순 전에 Vercel 대시보드 캡처 필요**
+- [사용자 집계 설정](./analytics-setup.md) — Vercel+GA4 두 축. GA4는 HTML 스니펫으로 초기화. 운영 통계는 2026-10-24 GA4 기준 회수 완료 · 맞춤 측정기준 section·video 2026-10-25 등록(소급 없음) · 링크 공개 9/26 · GA4 캡처 방법
 - [카카오 앱 설정](./kakao-app-setup.md) — 도메인은 「제품 링크 관리」에 등록. 플랫폼>Web 아님
 - [Vercel 배포 설정](./vercel-deploy-setup.md) — main 자동 배포 · Vercel 직접 배포 명령 사용 안 함 · 링크 최소 1년 유지 · Cloudflare R2 영상 제공 · 이전 Blob 파일·저장소 삭제 완료
 - [커밋·푸시는 지시받을 때만](./ask-before-commit-push.md) — push가 곧 공개 배포라 알아서 커밋하지 말 것

@@ -37,6 +37,8 @@
 | 2026-09-27 | [전체 최적화 검토와 기존 Vercel Blob 삭제](./2026-09-27-optimization-review.md) |
 | 2026-09-27 | [화면 밖 모션·캐시·폰트·이미지 최적화](./2026-09-27-static-optimization.md) |
 | 2026-09-29 | [졸업자 명단 4명 추가](./2026-09-29-roster-additions.md) |
+| 2026-10-24 | [GA4 기준 운영 통계 정리](./2026-10-24-ga4-operating-stats.md) |
+| 2026-10-25 | [GA4 맞춤 측정기준 등록과 링크 공개일 반영](./2026-10-25-ga4-custom-dimensions.md) |
 
 ## 작성 규칙
 
