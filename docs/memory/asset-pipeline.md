@@ -9,7 +9,7 @@ metadata:
 
 | 자산 | 원본 | 저장소 |
 |---|---|---|
-| 여정 사진 | 첫 수령분 원본은 **2026-09-11 삭제** (Google Drive에 있을 것으로 추정). 추가 수령 원본은 `assets/photo-originals/fellowship/`과 `graduation/`에 보관 | `FE/public/journey/<slug>/{thumb,full}/NN.webp` (리사이즈본만 커밋) |
+| 여정 사진 | 첫 수령분 원본은 **2026-09-11 삭제** (Google Drive에 있을 것으로 추정). 추가 수령 원본은 `assets/photo-originals/fellowship/`·`graduation/`·`cleaning/`에 보관 | `FE/public/journey/<slug>/{thumb,full}/NN.webp` (리사이즈본만 커밋) |
 | 영상 | **2026-09-26 기준: `assets/video-originals/`에 원본 21개 보존**. 새 간증 10개 + 이전 간증 4개 + 감사 7개 | `FE/public/video/`에 새 간증 10개·감사 합본의 preview/full/hd 재생본 33개 보관. 원본·변환 중간 파일·재생본 모두 git 제외 |
 | 영상 썸네일 | 기존 경량본에서 추출 | `FE/public/video-posters/`의 WebP 11장은 Git에 포함. 영상 교체 시 `--section posters`로 갱신 |
 
@@ -23,6 +23,7 @@ metadata:
 - 추가 수령한 `KakaoTalk_20260916_115318409_02.jpg`는 `assets/photo-originals/fellowship/`에 원본 그대로 보관하며 Git에서 제외합니다. 화면에서는 `fellowship/{thumb,full}/18.webp`를 사용합니다.
 - 사진을 일부만 추가할 때는 기존 번호 다음에 이어 붙입니다. **2026-09-22부터 변환 도구가 기존 출력 덮어쓰기를 거부**하므로 `--start`로 새 번호를 지정합니다. 규격은 thumb 320w·품질 78 / full 1280w·품질 82입니다.
 - 졸업 예배는 **2026-09-20 진행 완료**이며 사진을 더 받을 예정입니다. 단체 사진 원본은 `assets/photo-originals/graduation/01.jpg`로 보관했고, 다음 사진은 `02.jpg`부터 추가합니다. 수령 당시 파일명 `감사영상 추가된거.jpg`는 내용과 달랐으므로 원본 폴더의 `inventory.json`에 출처로만 남겼습니다.
+- **2026-11-02 「성전청소」 시기 추가** (식사 모임과 졸업 예배 사이, 사용자 지정 제목). 원본 4장(1400×1050, 촬영일 정보 없음)은 `assets/photo-originals/cleaning/01~04.jpg`에 받은 순서대로 보관하고 수령 파일명·SHA-256은 같은 폴더 `inventory.json`에 남겼습니다. 촬영 시기를 몰라 표시 시기는 식사 모임처럼 `2026`만 씁니다. 월을 알게 되면 `period`만 고칩니다.
 - **제자 수업 사진은 더 이상 수급 대기 대상이 아닙니다.** 2026-09-16 발주 측의 최종 삭제 요청을 사용자가 전달했습니다. 성구암송은 앞선 대화에서 나온 대안일 뿐 확정 요청이 아니므로, 별도 지시 없이 대체 항목을 만들거나 사진을 기다리며 복원하지 않습니다.
 
 **2026-09-27 이미지·폰트 최적화:** 새 화면은 사진 WebP 122개를 사용합니다. 기존 JPEG는 `assets/photo-originals/resized-before-webp/`에 복사·해시 검증했고, 이미 열린 페이지의 이전 JS가 사진을 계속 불러올 수 있도록 기존 공개 JPEG 주소도 보존합니다. 새 화면에서는 JPEG를 받지 않습니다. 추가 수령 원본 2장은 원본에서 다시 변환했습니다. 씰은 기존 PNG와 RGBA 픽셀이 같은 무손실 WebP를 `FE/src/assets/wax-seal.webp`에서 제공합니다. 명단·문구의 새 글자는 빌드의 부분 폰트 검사 대상입니다. 누락 안내가 나오면 `python scripts/prepare-fonts.py`로 재생성하며, 로컬 원본 캐시가 없는 경우에만 `--download`를 사용합니다. 자세한 방법·라이선스는 README를 따릅니다.

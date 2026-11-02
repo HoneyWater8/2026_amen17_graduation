@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────
    아멘 제자 17기 졸업 · 초대장 콘텐츠
    일시·장소 확정 — 2026-09-20 (주) 오후예배 14:30 · 다윗성전
-   명단 132명 · 여정 사진 61장 · 초원별 새 간증 영상 10편 반영.
+   명단 132명 · 여정 사진 65장 · 초원별 새 간증 영상 10편 반영.
    ───────────────────────────────────────────────────────── */
 
 import type { GraduationData, JourneyPhoto, TestimonyGroup } from './types';
@@ -102,6 +102,10 @@ export const G: GraduationData = {
     {
       period: "2026", title: "식사 모임",
       photos: photosOf("fellowship", 18, "식사 모임")
+    },
+    {
+      period: "2026", title: "성전청소",
+      photos: photosOf("cleaning", 4, "성전청소")
     },
     {
       period: "2026 · 09 · 20", title: "졸업 예배",
